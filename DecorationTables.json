@@ -25,33 +25,64 @@
       }
     },
     "decoration": {
-      "out_r": [
-        {"acc": "D","operator": "affect","value1": "neutral_f"}
-      ],
-      "out_a":[
-        {"acc": "R","operator": "g","value1": "R","value2": "C"},
-        {"acc": "C","operator": "affect","value1": "default_g_f"},
-        {"acc": "D","operator": "affect","value1": "neutral_f"}
-      ],
-      "maybe_b": [
-        {"acc": "D","operator": "phi_f","value1": "D","value2": "delta_f"}
-      ],
-      "maybe_a": [
-        {"acc": "D","operator": "phi_f","value1": "D","value2": "delta_f"}
-      ],
-      "found": [
-        {"acc": "C","operator": "phi_f","value1": "D","value2": "delta_f"},
-        {"acc": "D","operator": "affect","value1": "neutral_f"}
-      ],
-      "found_e": [
-        {"acc": "R","operator": "g","value1": "R,","value2": {"operator": "phi_f","value1": "D","value2": "delta_f"}},
-        {"acc": "D","operator": "affect","value1": "neutral_f"}
-      ],
-      "in": [
-        {"acc": "C","operator": "phi_f","value1": "C","value2": {"operator": "phi_f","value1": "D","value2": "delta_f"}},
-        {"acc": "D","operator": "affect","value1": "neutral_f"}
-      ],
-      "out":[]
+      "after0": {
+        "out_r": [
+          {"acc": "D","operator": "affect","value1": "neutral_f"}
+        ],
+        "out_a":[
+          {"acc": "R","operator": "g","value1": "R","value2": "C"},
+          {"acc": "C","operator": "affect","value1": "default_g_f"},
+          {"acc": "D","operator": "affect","value1": "neutral_f"}
+        ],
+        "maybe_b": [
+          {"acc": "D","operator": "phi_f","value1": "D","value2": "delta_f"}
+        ],
+        "maybe_a": [
+          {"acc": "D","operator": "phi_f","value1": "D","value2": "delta_f_1"}
+        ],
+        "found": [
+          {"acc": "C","operator": "phi_f","value1": "delta_f_1","value2": {"operator": "phi_f","value1": "D","value2": "delta_f"}},
+          {"acc": "D","operator": "affect","value1": "neutral_f"}
+        ],
+        "found_e": [
+          {"acc": "R","operator": "g","value1": "R","value2": {"operator": "phi_f","value1": "delta_f_1","value2": {"operator": "phi_f","value1": "D","value2": "delta_f"}}},
+          {"acc": "D","operator": "affect","value1": "neutral_f"}
+        ],
+        "in": [
+          {"acc": "C","operator": "phi_f","value1": "C","value2": {"operator": "phi_f","value1": "D","value2": "delta_f_1"}},
+          {"acc": "D","operator": "affect","value1": "neutral_f"}
+        ],
+        "out":[]
+      },
+      "after1": {
+        "out_r": [
+          {"acc": "D","operator": "affect","value1": "neutral_f"}
+        ],
+        "out_a":[
+          {"acc": "R","operator": "g","value1": "R","value2": "C"},
+          {"acc": "C","operator": "affect","value1": "default_g_f"},
+          {"acc": "D","operator": "affect","value1": "neutral_f"}
+        ],
+        "maybe_b": [
+          {"acc": "D","operator": "phi_f","value1": "D","value2": "delta_f"}
+        ],
+        "maybe_a": [
+          {"acc": "D","operator": "phi_f","value1": "D","value2": "delta_f"}
+        ],
+        "found": [
+          {"acc": "C","operator": "phi_f","value1": "D","value2": "delta_f"},
+          {"acc": "D","operator": "affect","value1": "neutral_f"}
+        ],
+        "found_e": [
+          {"acc": "R","operator": "g","value1": "R","value2": {"operator": "phi_f","value1": "D","value2": "delta_f"}},
+          {"acc": "D","operator": "affect","value1": "neutral_f"}
+        ],
+        "in": [
+          {"acc": "C","operator": "phi_f","value1": "C","value2": {"operator": "phi_f","value1": "D","value2": "delta_f"}},
+          {"acc": "D","operator": "affect","value1": "neutral_f"}
+        ],
+        "out":[]
+      }
     }
   }
 }

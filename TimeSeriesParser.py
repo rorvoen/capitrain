@@ -1,4 +1,5 @@
 import json
+from math import inf
 
 from Enums.Semantics import Semantics
 
@@ -34,6 +35,13 @@ def signature_to_semantic(signature, pattern):
             j += 1
         i += 1
     return res
+
+def find_pattern_occurrences_semantics(semantics):
+    res = []
+    for semantic in semantics:
+        res.append(float(-inf))
+
+
 
 
 def format_semantics_result(semantics):

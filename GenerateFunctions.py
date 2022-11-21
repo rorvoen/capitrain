@@ -47,14 +47,17 @@ def generate_functions():
                 # Declaring delta_f which sometime is equal to current position in time series
                 if features[feature]["delta_f"] == "x_i":
                     f.write("        delta_f = time_series[i]\n")
+                    f.write("        delta_f_1 = time_series[i+1]\n")
                 else:
                     f.write("        delta_f = " + features[feature]["delta_f"] + "\n")
 
                 f.write("        match word:\n")
                 for word in Semantics:
-                    if bool(decoration[word.value]):  # Checking if there is operations for this word
+                    after_value = patterns[pattern.value]["after"].__str__()
+                    if bool(decoration["after"+after_value][word.value]):  # Checking if there is operations for word
+                        # (possibility to remove case if no corresponding word in the semantics)
                         f.write("            case Semantics." + word.name + ":\n")
-                    operations = decoration[word.value]
+                    operations = decoration["after"+after_value][word.value]
                     for operation in operations:
                         f.write("                " + prepare_operation_line(operation, g, phi_f) + "\n")
 

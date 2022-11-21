@@ -16,8 +16,6 @@ def testing():
             total_ko += 1
             print("-------------------------")
             print(test + " is KO")
-            print("Obtained "+res.__str__())
-            print("Required " + tests[test]["result"].__str__())
             print("-------------------------")
 
     print("==============================")

@@ -17,12 +17,13 @@ def pos_max_max_bump_on_decreasing_sequence(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (max(float(D), float(delta_f))))
+                R = max(float(R), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
@@ -56,22 +57,23 @@ def pos_max_max_decreasing(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (max(float(D), float(delta_f))))
+                R = max(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                C = max(float(C), (max(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                D = max(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = max(float(R), float(C))
                 C = float(default_g_f)
@@ -95,22 +97,23 @@ def pos_max_max_decreasing_sequence(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (max(float(D), float(delta_f))))
+                R = max(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                C = max(float(C), (max(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                D = max(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = max(float(R), float(C))
                 C = float(default_g_f)
@@ -134,22 +137,23 @@ def pos_max_max_decreasing_terrace(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (max(float(D), float(delta_f))))
+                R = max(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                C = max(float(C), (max(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                D = max(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = max(float(R), float(C))
                 C = float(default_g_f)
@@ -173,12 +177,13 @@ def pos_max_max_dip_on_increasing_sequence(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (max(float(D), float(delta_f))))
+                R = max(float(R), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
@@ -212,12 +217,13 @@ def pos_max_max_gorge(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (max(float(D), float(delta_f))))
+                R = max(float(R), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
@@ -251,22 +257,23 @@ def pos_max_max_increasing(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (max(float(D), float(delta_f))))
+                R = max(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                C = max(float(C), (max(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                D = max(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = max(float(R), float(C))
                 C = float(default_g_f)
@@ -290,22 +297,23 @@ def pos_max_max_increasing_sequence(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (max(float(D), float(delta_f))))
+                R = max(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                C = max(float(C), (max(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                D = max(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = max(float(R), float(C))
                 C = float(default_g_f)
@@ -329,12 +337,13 @@ def pos_max_max_increasing_terrace(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (max(float(D), float(delta_f))))
+                R = max(float(R), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
@@ -368,12 +377,13 @@ def pos_max_max_inflexion(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (max(float(D), float(delta_f))))
+                R = max(float(R), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
@@ -407,12 +417,13 @@ def pos_max_max_peak(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (max(float(D), float(delta_f))))
+                R = max(float(R), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
@@ -446,12 +457,13 @@ def pos_max_max_plain(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (max(float(D), float(delta_f))))
+                R = max(float(R), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
@@ -485,12 +497,13 @@ def pos_max_max_plateau(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (max(float(D), float(delta_f))))
+                R = max(float(R), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
@@ -524,12 +537,13 @@ def pos_max_max_proper_plain(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (max(float(D), float(delta_f))))
+                R = max(float(R), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
@@ -563,12 +577,13 @@ def pos_max_max_proper_plateau(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (max(float(D), float(delta_f))))
+                R = max(float(R), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
@@ -602,22 +617,23 @@ def pos_max_max_steady(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (max(float(D), float(delta_f))))
+                R = max(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                C = max(float(C), (max(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                D = max(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = max(float(R), float(C))
                 C = float(default_g_f)
@@ -641,22 +657,23 @@ def pos_max_max_steady_sequence(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (max(float(D), float(delta_f))))
+                R = max(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                C = max(float(C), (max(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                D = max(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = max(float(R), float(C))
                 C = float(default_g_f)
@@ -680,22 +697,23 @@ def pos_max_max_strictly_decreasing_sequence(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (max(float(D), float(delta_f))))
+                R = max(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                C = max(float(C), (max(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                D = max(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = max(float(R), float(C))
                 C = float(default_g_f)
@@ -719,22 +737,23 @@ def pos_max_max_strictly_increasing_sequence(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (max(float(D), float(delta_f))))
+                R = max(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                C = max(float(C), (max(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                D = max(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = max(float(R), float(C))
                 C = float(default_g_f)
@@ -758,12 +777,13 @@ def pos_max_max_summit(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (max(float(D), float(delta_f))))
+                R = max(float(R), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
@@ -797,12 +817,13 @@ def pos_max_max_valley(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (max(float(D), float(delta_f))))
+                R = max(float(R), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
@@ -836,12 +857,13 @@ def pos_max_max_zigzag(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (max(float(D), float(delta_f))))
+                R = max(float(R), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
@@ -875,12 +897,13 @@ def pos_max_min_bump_on_decreasing_sequence(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (min(float(D), float(delta_f))))
+                R = max(float(R), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
@@ -914,22 +937,23 @@ def pos_max_min_decreasing(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (min(float(D), float(delta_f))))
+                R = max(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                C = min(float(C), (min(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                D = min(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = max(float(R), float(C))
                 C = float(default_g_f)
@@ -953,22 +977,23 @@ def pos_max_min_decreasing_sequence(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (min(float(D), float(delta_f))))
+                R = max(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                C = min(float(C), (min(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                D = min(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = max(float(R), float(C))
                 C = float(default_g_f)
@@ -992,22 +1017,23 @@ def pos_max_min_decreasing_terrace(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (min(float(D), float(delta_f))))
+                R = max(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                C = min(float(C), (min(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                D = min(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = max(float(R), float(C))
                 C = float(default_g_f)
@@ -1031,12 +1057,13 @@ def pos_max_min_dip_on_increasing_sequence(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (min(float(D), float(delta_f))))
+                R = max(float(R), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
@@ -1070,12 +1097,13 @@ def pos_max_min_gorge(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (min(float(D), float(delta_f))))
+                R = max(float(R), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
@@ -1109,22 +1137,23 @@ def pos_max_min_increasing(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (min(float(D), float(delta_f))))
+                R = max(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                C = min(float(C), (min(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                D = min(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = max(float(R), float(C))
                 C = float(default_g_f)
@@ -1148,22 +1177,23 @@ def pos_max_min_increasing_sequence(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (min(float(D), float(delta_f))))
+                R = max(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                C = min(float(C), (min(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                D = min(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = max(float(R), float(C))
                 C = float(default_g_f)
@@ -1187,12 +1217,13 @@ def pos_max_min_increasing_terrace(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (min(float(D), float(delta_f))))
+                R = max(float(R), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
@@ -1226,12 +1257,13 @@ def pos_max_min_inflexion(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (min(float(D), float(delta_f))))
+                R = max(float(R), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
@@ -1265,12 +1297,13 @@ def pos_max_min_peak(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (min(float(D), float(delta_f))))
+                R = max(float(R), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
@@ -1304,12 +1337,13 @@ def pos_max_min_plain(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (min(float(D), float(delta_f))))
+                R = max(float(R), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
@@ -1343,12 +1377,13 @@ def pos_max_min_plateau(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (min(float(D), float(delta_f))))
+                R = max(float(R), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
@@ -1382,12 +1417,13 @@ def pos_max_min_proper_plain(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (min(float(D), float(delta_f))))
+                R = max(float(R), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
@@ -1421,12 +1457,13 @@ def pos_max_min_proper_plateau(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (min(float(D), float(delta_f))))
+                R = max(float(R), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
@@ -1460,22 +1497,23 @@ def pos_max_min_steady(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (min(float(D), float(delta_f))))
+                R = max(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                C = min(float(C), (min(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                D = min(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = max(float(R), float(C))
                 C = float(default_g_f)
@@ -1499,22 +1537,23 @@ def pos_max_min_steady_sequence(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (min(float(D), float(delta_f))))
+                R = max(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                C = min(float(C), (min(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                D = min(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = max(float(R), float(C))
                 C = float(default_g_f)
@@ -1538,22 +1577,23 @@ def pos_max_min_strictly_decreasing_sequence(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (min(float(D), float(delta_f))))
+                R = max(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                C = min(float(C), (min(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                D = min(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = max(float(R), float(C))
                 C = float(default_g_f)
@@ -1577,22 +1617,23 @@ def pos_max_min_strictly_increasing_sequence(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (min(float(D), float(delta_f))))
+                R = max(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                C = min(float(C), (min(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                D = min(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = max(float(R), float(C))
                 C = float(default_g_f)
@@ -1616,12 +1657,13 @@ def pos_max_min_summit(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (min(float(D), float(delta_f))))
+                R = max(float(R), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
@@ -1655,12 +1697,13 @@ def pos_max_min_valley(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (min(float(D), float(delta_f))))
+                R = max(float(R), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
@@ -1694,12 +1737,13 @@ def pos_max_min_zigzag(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = max(float(R,), (min(float(D), float(delta_f))))
+                R = max(float(R), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
@@ -1733,12 +1777,13 @@ def pos_min_max_bump_on_decreasing_sequence(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (max(float(D), float(delta_f))))
+                R = min(float(R), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
@@ -1772,22 +1817,23 @@ def pos_min_max_decreasing(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (max(float(D), float(delta_f))))
+                R = min(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                C = max(float(C), (max(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                D = max(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = min(float(R), float(C))
                 C = float(default_g_f)
@@ -1811,22 +1857,23 @@ def pos_min_max_decreasing_sequence(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (max(float(D), float(delta_f))))
+                R = min(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                C = max(float(C), (max(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                D = max(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = min(float(R), float(C))
                 C = float(default_g_f)
@@ -1850,22 +1897,23 @@ def pos_min_max_decreasing_terrace(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (max(float(D), float(delta_f))))
+                R = min(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                C = max(float(C), (max(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                D = max(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = min(float(R), float(C))
                 C = float(default_g_f)
@@ -1889,12 +1937,13 @@ def pos_min_max_dip_on_increasing_sequence(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (max(float(D), float(delta_f))))
+                R = min(float(R), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
@@ -1928,12 +1977,13 @@ def pos_min_max_gorge(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (max(float(D), float(delta_f))))
+                R = min(float(R), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
@@ -1967,22 +2017,23 @@ def pos_min_max_increasing(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (max(float(D), float(delta_f))))
+                R = min(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                C = max(float(C), (max(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                D = max(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = min(float(R), float(C))
                 C = float(default_g_f)
@@ -2006,22 +2057,23 @@ def pos_min_max_increasing_sequence(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (max(float(D), float(delta_f))))
+                R = min(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                C = max(float(C), (max(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                D = max(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = min(float(R), float(C))
                 C = float(default_g_f)
@@ -2045,12 +2097,13 @@ def pos_min_max_increasing_terrace(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (max(float(D), float(delta_f))))
+                R = min(float(R), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
@@ -2084,12 +2137,13 @@ def pos_min_max_inflexion(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (max(float(D), float(delta_f))))
+                R = min(float(R), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
@@ -2123,12 +2177,13 @@ def pos_min_max_peak(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (max(float(D), float(delta_f))))
+                R = min(float(R), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
@@ -2162,12 +2217,13 @@ def pos_min_max_plain(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (max(float(D), float(delta_f))))
+                R = min(float(R), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
@@ -2201,12 +2257,13 @@ def pos_min_max_plateau(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (max(float(D), float(delta_f))))
+                R = min(float(R), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
@@ -2240,12 +2297,13 @@ def pos_min_max_proper_plain(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (max(float(D), float(delta_f))))
+                R = min(float(R), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
@@ -2279,12 +2337,13 @@ def pos_min_max_proper_plateau(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (max(float(D), float(delta_f))))
+                R = min(float(R), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
@@ -2318,22 +2377,23 @@ def pos_min_max_steady(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (max(float(D), float(delta_f))))
+                R = min(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                C = max(float(C), (max(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                D = max(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = min(float(R), float(C))
                 C = float(default_g_f)
@@ -2357,22 +2417,23 @@ def pos_min_max_steady_sequence(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (max(float(D), float(delta_f))))
+                R = min(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                C = max(float(C), (max(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                D = max(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = min(float(R), float(C))
                 C = float(default_g_f)
@@ -2396,22 +2457,23 @@ def pos_min_max_strictly_decreasing_sequence(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (max(float(D), float(delta_f))))
+                R = min(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                C = max(float(C), (max(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                D = max(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = min(float(R), float(C))
                 C = float(default_g_f)
@@ -2435,22 +2497,23 @@ def pos_min_max_strictly_increasing_sequence(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (max(float(D), float(delta_f))))
+                R = min(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                C = max(float(C), (max(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                D = max(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = min(float(R), float(C))
                 C = float(default_g_f)
@@ -2474,12 +2537,13 @@ def pos_min_max_summit(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (max(float(D), float(delta_f))))
+                R = min(float(R), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
@@ -2513,12 +2577,13 @@ def pos_min_max_valley(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (max(float(D), float(delta_f))))
+                R = min(float(R), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
@@ -2552,12 +2617,13 @@ def pos_min_max_zigzag(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (max(float(D), float(delta_f))))
+                R = min(float(R), (max(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = max(float(D), float(delta_f))
@@ -2591,12 +2657,13 @@ def pos_min_min_bump_on_decreasing_sequence(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (min(float(D), float(delta_f))))
+                R = min(float(R), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
@@ -2630,22 +2697,23 @@ def pos_min_min_decreasing(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (min(float(D), float(delta_f))))
+                R = min(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                C = min(float(C), (min(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                D = min(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = min(float(R), float(C))
                 C = float(default_g_f)
@@ -2669,22 +2737,23 @@ def pos_min_min_decreasing_sequence(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (min(float(D), float(delta_f))))
+                R = min(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                C = min(float(C), (min(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                D = min(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = min(float(R), float(C))
                 C = float(default_g_f)
@@ -2708,22 +2777,23 @@ def pos_min_min_decreasing_terrace(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (min(float(D), float(delta_f))))
+                R = min(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                C = min(float(C), (min(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                D = min(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = min(float(R), float(C))
                 C = float(default_g_f)
@@ -2747,12 +2817,13 @@ def pos_min_min_dip_on_increasing_sequence(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (min(float(D), float(delta_f))))
+                R = min(float(R), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
@@ -2786,12 +2857,13 @@ def pos_min_min_gorge(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (min(float(D), float(delta_f))))
+                R = min(float(R), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
@@ -2825,22 +2897,23 @@ def pos_min_min_increasing(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (min(float(D), float(delta_f))))
+                R = min(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                C = min(float(C), (min(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                D = min(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = min(float(R), float(C))
                 C = float(default_g_f)
@@ -2864,22 +2937,23 @@ def pos_min_min_increasing_sequence(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (min(float(D), float(delta_f))))
+                R = min(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                C = min(float(C), (min(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                D = min(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = min(float(R), float(C))
                 C = float(default_g_f)
@@ -2903,12 +2977,13 @@ def pos_min_min_increasing_terrace(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (min(float(D), float(delta_f))))
+                R = min(float(R), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
@@ -2942,12 +3017,13 @@ def pos_min_min_inflexion(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (min(float(D), float(delta_f))))
+                R = min(float(R), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
@@ -2981,12 +3057,13 @@ def pos_min_min_peak(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (min(float(D), float(delta_f))))
+                R = min(float(R), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
@@ -3020,12 +3097,13 @@ def pos_min_min_plain(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (min(float(D), float(delta_f))))
+                R = min(float(R), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
@@ -3059,12 +3137,13 @@ def pos_min_min_plateau(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (min(float(D), float(delta_f))))
+                R = min(float(R), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
@@ -3098,12 +3177,13 @@ def pos_min_min_proper_plain(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (min(float(D), float(delta_f))))
+                R = min(float(R), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
@@ -3137,12 +3217,13 @@ def pos_min_min_proper_plateau(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (min(float(D), float(delta_f))))
+                R = min(float(R), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
@@ -3176,22 +3257,23 @@ def pos_min_min_steady(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (min(float(D), float(delta_f))))
+                R = min(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                C = min(float(C), (min(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                D = min(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = min(float(R), float(C))
                 C = float(default_g_f)
@@ -3215,22 +3297,23 @@ def pos_min_min_steady_sequence(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (min(float(D), float(delta_f))))
+                R = min(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                C = min(float(C), (min(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                D = min(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = min(float(R), float(C))
                 C = float(default_g_f)
@@ -3254,22 +3337,23 @@ def pos_min_min_strictly_decreasing_sequence(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (min(float(D), float(delta_f))))
+                R = min(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                C = min(float(C), (min(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                D = min(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = min(float(R), float(C))
                 C = float(default_g_f)
@@ -3293,22 +3377,23 @@ def pos_min_min_strictly_increasing_sequence(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (min(float(D), float(delta_f))))
+                R = min(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
             case Semantics.OUT_RESET:
                 D = float(neutral_f)
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                C = min(float(C), (min(float(D), float(delta_f_1))))
                 D = float(neutral_f)
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                D = min(float(D), float(delta_f_1))
             case Semantics.OUT_AFTER:
                 R = min(float(R), float(C))
                 C = float(default_g_f)
@@ -3332,12 +3417,13 @@ def pos_min_min_summit(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (min(float(D), float(delta_f))))
+                R = min(float(R), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
@@ -3371,12 +3457,13 @@ def pos_min_min_valley(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (min(float(D), float(delta_f))))
+                R = min(float(R), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
@@ -3410,12 +3497,13 @@ def pos_min_min_zigzag(time_series):
 
     for word in semantics:
         delta_f = time_series[i]
+        delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
                 D = float(neutral_f)
             case Semantics.FOUND_END:
-                R = min(float(R,), (min(float(D), float(delta_f))))
+                R = min(float(R), (min(float(D), float(delta_f))))
                 D = float(neutral_f)
             case Semantics.MAYBE_BEFORE:
                 D = min(float(D), float(delta_f))
