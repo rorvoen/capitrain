@@ -39,11 +39,14 @@ def generate_functions():
                 # Declaring accumulators
                 f.write("    R = default_g_f\n    C = default_g_f\n    D = neutral_f\n\n")
 
+                # Declaring the i counter for getting current value in the series
+                f.write("    i = 0\n\n")
+
                 f.write("    for word in semantics:\n")
 
                 # Declaring delta_f which sometime is equal to current position in time series
                 if features[feature]["delta_f"] == "x_i":
-                    f.write("        delta_f = time_series[semantics.index(word)]\n")
+                    f.write("        delta_f = time_series[i]\n")
                 else:
                     f.write("        delta_f = " + features[feature]["delta_f"] + "\n")
 
@@ -54,6 +57,8 @@ def generate_functions():
                     operations = decoration[word.value]
                     for operation in operations:
                         f.write("                " + prepare_operation_line(operation, g, phi_f) + "\n")
+
+                f.write("        i += 1 \n")
 
                 f.write("\n    return " + g + "(R, C)\n")
                 f.write("\n\n")
