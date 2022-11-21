@@ -17,3 +17,11 @@ print(format_semantics_result(test_semantics))
 generate_functions()
 
 testing()
+
+test_semantics2 = [Semantics.OUT, Semantics.OUT, Semantics.MAYBE_BEFORE, Semantics.MAYBE_BEFORE, Semantics.FOUND]
+test_semantics3 = [Semantics.OUT, Semantics.OUT, Semantics.MAYBE_BEFORE, Semantics.MAYBE_BEFORE, Semantics.FOUND_END]
+test_semantics4 = [Semantics.OUT, Semantics.OUT, Semantics.MAYBE_BEFORE, Semantics.MAYBE_BEFORE, Semantics.OUT]
+test_semantics5 = [Semantics.OUT, Semantics.OUT, Semantics.MAYBE_BEFORE, Semantics.MAYBE_BEFORE, Semantics.FOUND, Semantics.MAYBE_AFTER, Semantics.MAYBE_AFTER, Semantics.IN, Semantics.OUT_RESET, Semantics.OUT ]
+test_semantics6 = [Semantics.OUT, Semantics.OUT, Semantics.OUT, Semantics.OUT, Semantics.MAYBE_BEFORE, Semantics.FOUND, Semantics.MAYBE_AFTER, Semantics.OUT_AFTER, Semantics.MAYBE_BEFORE, Semantics.MAYBE_BEFORE, Semantics.FOUND, Semantics.OUT_AFTER, Semantics.MAYBE_BEFORE, Semantics.MAYBE_BEFORE, Semantics.FOUND]
+
+print(find_pattern_occurrences_semantics(test_semantics6))
