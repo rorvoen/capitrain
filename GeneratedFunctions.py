@@ -1,6 +1,7 @@
 from math import inf
 from Enums.Patterns import Patterns
-from TimeSerieParser import *
+from TimeSeriesParser import *
+
 
 def pos_max_max_bump_on_decreasing_sequence(time_series):
     signature = time_series_to_signature_parser(time_series)
@@ -34,7 +35,8 @@ def pos_max_max_bump_on_decreasing_sequence(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_max_decreasing(time_series):
@@ -69,7 +71,8 @@ def pos_max_max_decreasing(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_max_decreasing_sequence(time_series):
@@ -104,7 +107,8 @@ def pos_max_max_decreasing_sequence(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_max_decreasing_terrace(time_series):
@@ -139,7 +143,8 @@ def pos_max_max_decreasing_terrace(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_max_dip_on_increasing_sequence(time_series):
@@ -174,7 +179,8 @@ def pos_max_max_dip_on_increasing_sequence(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_max_gorge(time_series):
@@ -209,7 +215,8 @@ def pos_max_max_gorge(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_max_increasing(time_series):
@@ -244,7 +251,8 @@ def pos_max_max_increasing(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_max_increasing_sequence(time_series):
@@ -279,7 +287,8 @@ def pos_max_max_increasing_sequence(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_max_increasing_terrace(time_series):
@@ -314,7 +323,8 @@ def pos_max_max_increasing_terrace(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_max_inflexion(time_series):
@@ -349,7 +359,8 @@ def pos_max_max_inflexion(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_max_peak(time_series):
@@ -384,7 +395,8 @@ def pos_max_max_peak(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_max_plain(time_series):
@@ -419,7 +431,8 @@ def pos_max_max_plain(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_max_plateau(time_series):
@@ -454,7 +467,8 @@ def pos_max_max_plateau(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_max_proper_plain(time_series):
@@ -489,7 +503,8 @@ def pos_max_max_proper_plain(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_max_proper_plateau(time_series):
@@ -524,7 +539,8 @@ def pos_max_max_proper_plateau(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_max_steady(time_series):
@@ -559,10 +575,11 @@ def pos_max_max_steady(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
-def pos_max_max_steady_seaquence(time_series):
+def pos_max_max_steady_sequence(time_series):
     signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.STEADY_SEQUENCE)
     default_g_f = -inf
@@ -594,10 +611,11 @@ def pos_max_max_steady_seaquence(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
-def pos_max_max_strictly_decreasing(time_series):
+def pos_max_max_strictly_decreasing_sequence(time_series):
     signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.STRICTLY_DECREASING_SEQUENCE)
     default_g_f = -inf
@@ -629,10 +647,11 @@ def pos_max_max_strictly_decreasing(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
-def pos_max_max_strictly_increasing(time_series):
+def pos_max_max_strictly_increasing_sequence(time_series):
     signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.STRICTLY_INCREASING_SEQUENCE)
     default_g_f = -inf
@@ -664,7 +683,8 @@ def pos_max_max_strictly_increasing(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_max_summit(time_series):
@@ -699,7 +719,8 @@ def pos_max_max_summit(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_max_valley(time_series):
@@ -734,7 +755,8 @@ def pos_max_max_valley(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_max_zigzag(time_series):
@@ -769,7 +791,8 @@ def pos_max_max_zigzag(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_min_bump_on_decreasing_sequence(time_series):
@@ -804,7 +827,8 @@ def pos_max_min_bump_on_decreasing_sequence(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_min_decreasing(time_series):
@@ -839,7 +863,8 @@ def pos_max_min_decreasing(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_min_decreasing_sequence(time_series):
@@ -874,7 +899,8 @@ def pos_max_min_decreasing_sequence(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_min_decreasing_terrace(time_series):
@@ -909,7 +935,8 @@ def pos_max_min_decreasing_terrace(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_min_dip_on_increasing_sequence(time_series):
@@ -944,7 +971,8 @@ def pos_max_min_dip_on_increasing_sequence(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_min_gorge(time_series):
@@ -979,7 +1007,8 @@ def pos_max_min_gorge(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_min_increasing(time_series):
@@ -1014,7 +1043,8 @@ def pos_max_min_increasing(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_min_increasing_sequence(time_series):
@@ -1049,7 +1079,8 @@ def pos_max_min_increasing_sequence(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_min_increasing_terrace(time_series):
@@ -1084,7 +1115,8 @@ def pos_max_min_increasing_terrace(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_min_inflexion(time_series):
@@ -1119,7 +1151,8 @@ def pos_max_min_inflexion(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_min_peak(time_series):
@@ -1154,7 +1187,8 @@ def pos_max_min_peak(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_min_plain(time_series):
@@ -1189,7 +1223,8 @@ def pos_max_min_plain(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_min_plateau(time_series):
@@ -1224,7 +1259,8 @@ def pos_max_min_plateau(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_min_proper_plain(time_series):
@@ -1259,7 +1295,8 @@ def pos_max_min_proper_plain(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_min_proper_plateau(time_series):
@@ -1294,7 +1331,8 @@ def pos_max_min_proper_plateau(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_min_steady(time_series):
@@ -1329,10 +1367,11 @@ def pos_max_min_steady(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
-def pos_max_min_steady_seaquence(time_series):
+def pos_max_min_steady_sequence(time_series):
     signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.STEADY_SEQUENCE)
     default_g_f = -inf
@@ -1364,10 +1403,11 @@ def pos_max_min_steady_seaquence(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
-def pos_max_min_strictly_decreasing(time_series):
+def pos_max_min_strictly_decreasing_sequence(time_series):
     signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.STRICTLY_DECREASING_SEQUENCE)
     default_g_f = -inf
@@ -1399,10 +1439,11 @@ def pos_max_min_strictly_decreasing(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
-def pos_max_min_strictly_increasing(time_series):
+def pos_max_min_strictly_increasing_sequence(time_series):
     signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.STRICTLY_INCREASING_SEQUENCE)
     default_g_f = -inf
@@ -1434,7 +1475,8 @@ def pos_max_min_strictly_increasing(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_min_summit(time_series):
@@ -1469,7 +1511,8 @@ def pos_max_min_summit(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_min_valley(time_series):
@@ -1504,7 +1547,8 @@ def pos_max_min_valley(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_max_min_zigzag(time_series):
@@ -1539,7 +1583,8 @@ def pos_max_min_zigzag(time_series):
                 R = max(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return max(R, C)
 
 
 def pos_min_max_bump_on_decreasing_sequence(time_series):
@@ -1574,7 +1619,8 @@ def pos_min_max_bump_on_decreasing_sequence(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_max_decreasing(time_series):
@@ -1609,7 +1655,8 @@ def pos_min_max_decreasing(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_max_decreasing_sequence(time_series):
@@ -1644,7 +1691,8 @@ def pos_min_max_decreasing_sequence(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_max_decreasing_terrace(time_series):
@@ -1679,7 +1727,8 @@ def pos_min_max_decreasing_terrace(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_max_dip_on_increasing_sequence(time_series):
@@ -1714,7 +1763,8 @@ def pos_min_max_dip_on_increasing_sequence(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_max_gorge(time_series):
@@ -1749,7 +1799,8 @@ def pos_min_max_gorge(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_max_increasing(time_series):
@@ -1784,7 +1835,8 @@ def pos_min_max_increasing(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_max_increasing_sequence(time_series):
@@ -1819,7 +1871,8 @@ def pos_min_max_increasing_sequence(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_max_increasing_terrace(time_series):
@@ -1854,7 +1907,8 @@ def pos_min_max_increasing_terrace(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_max_inflexion(time_series):
@@ -1889,7 +1943,8 @@ def pos_min_max_inflexion(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_max_peak(time_series):
@@ -1924,7 +1979,8 @@ def pos_min_max_peak(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_max_plain(time_series):
@@ -1959,7 +2015,8 @@ def pos_min_max_plain(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_max_plateau(time_series):
@@ -1994,7 +2051,8 @@ def pos_min_max_plateau(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_max_proper_plain(time_series):
@@ -2029,7 +2087,8 @@ def pos_min_max_proper_plain(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_max_proper_plateau(time_series):
@@ -2064,7 +2123,8 @@ def pos_min_max_proper_plateau(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_max_steady(time_series):
@@ -2099,10 +2159,11 @@ def pos_min_max_steady(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
-def pos_min_max_steady_seaquence(time_series):
+def pos_min_max_steady_sequence(time_series):
     signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.STEADY_SEQUENCE)
     default_g_f = inf
@@ -2134,10 +2195,11 @@ def pos_min_max_steady_seaquence(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
-def pos_min_max_strictly_decreasing(time_series):
+def pos_min_max_strictly_decreasing_sequence(time_series):
     signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.STRICTLY_DECREASING_SEQUENCE)
     default_g_f = inf
@@ -2169,10 +2231,11 @@ def pos_min_max_strictly_decreasing(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
-def pos_min_max_strictly_increasing(time_series):
+def pos_min_max_strictly_increasing_sequence(time_series):
     signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.STRICTLY_INCREASING_SEQUENCE)
     default_g_f = inf
@@ -2204,7 +2267,8 @@ def pos_min_max_strictly_increasing(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_max_summit(time_series):
@@ -2239,7 +2303,8 @@ def pos_min_max_summit(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_max_valley(time_series):
@@ -2274,7 +2339,8 @@ def pos_min_max_valley(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_max_zigzag(time_series):
@@ -2309,7 +2375,8 @@ def pos_min_max_zigzag(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_min_bump_on_decreasing_sequence(time_series):
@@ -2344,7 +2411,8 @@ def pos_min_min_bump_on_decreasing_sequence(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_min_decreasing(time_series):
@@ -2379,7 +2447,8 @@ def pos_min_min_decreasing(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_min_decreasing_sequence(time_series):
@@ -2414,7 +2483,8 @@ def pos_min_min_decreasing_sequence(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_min_decreasing_terrace(time_series):
@@ -2449,7 +2519,8 @@ def pos_min_min_decreasing_terrace(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_min_dip_on_increasing_sequence(time_series):
@@ -2484,7 +2555,8 @@ def pos_min_min_dip_on_increasing_sequence(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_min_gorge(time_series):
@@ -2519,7 +2591,8 @@ def pos_min_min_gorge(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_min_increasing(time_series):
@@ -2554,7 +2627,8 @@ def pos_min_min_increasing(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_min_increasing_sequence(time_series):
@@ -2589,7 +2663,8 @@ def pos_min_min_increasing_sequence(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_min_increasing_terrace(time_series):
@@ -2624,7 +2699,8 @@ def pos_min_min_increasing_terrace(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_min_inflexion(time_series):
@@ -2659,7 +2735,8 @@ def pos_min_min_inflexion(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_min_peak(time_series):
@@ -2694,7 +2771,8 @@ def pos_min_min_peak(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_min_plain(time_series):
@@ -2729,7 +2807,8 @@ def pos_min_min_plain(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_min_plateau(time_series):
@@ -2764,7 +2843,8 @@ def pos_min_min_plateau(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_min_proper_plain(time_series):
@@ -2799,7 +2879,8 @@ def pos_min_min_proper_plain(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_min_proper_plateau(time_series):
@@ -2834,7 +2915,8 @@ def pos_min_min_proper_plateau(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_min_steady(time_series):
@@ -2869,10 +2951,11 @@ def pos_min_min_steady(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
-def pos_min_min_steady_seaquence(time_series):
+def pos_min_min_steady_sequence(time_series):
     signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.STEADY_SEQUENCE)
     default_g_f = inf
@@ -2904,10 +2987,11 @@ def pos_min_min_steady_seaquence(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
-def pos_min_min_strictly_decreasing(time_series):
+def pos_min_min_strictly_decreasing_sequence(time_series):
     signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.STRICTLY_DECREASING_SEQUENCE)
     default_g_f = inf
@@ -2939,10 +3023,11 @@ def pos_min_min_strictly_decreasing(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
-def pos_min_min_strictly_increasing(time_series):
+def pos_min_min_strictly_increasing_sequence(time_series):
     signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.STRICTLY_INCREASING_SEQUENCE)
     default_g_f = inf
@@ -2974,7 +3059,8 @@ def pos_min_min_strictly_increasing(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_min_summit(time_series):
@@ -3009,7 +3095,8 @@ def pos_min_min_summit(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_min_valley(time_series):
@@ -3044,7 +3131,8 @@ def pos_min_min_valley(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 
 def pos_min_min_zigzag(time_series):
@@ -3079,6 +3167,7 @@ def pos_min_min_zigzag(time_series):
                 R = min(float(R), float(C))
                 C = float(default_g_f)
                 D = float(neutral_f)
-            case Semantics.OUT:
+
+    return min(R, C)
 
 

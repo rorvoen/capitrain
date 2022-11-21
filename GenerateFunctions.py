@@ -1,6 +1,5 @@
 import json
 
-import Utils
 from Enums.Patterns import Patterns
 from Enums.Semantics import Semantics
 
@@ -9,7 +8,7 @@ def generate_functions():
     f = open("GeneratedFunctions.py", "w")
     f.write("from math import inf\n")
     f.write("from Enums.Patterns import Patterns\n")
-    f.write("from TimeSerieParser import *\n\n")
+    f.write("from TimeSeriesParser import *\n\n\n")
     f.close()
 
     tables = json.load(open('DecorationTables.json'))["tables"]
@@ -50,11 +49,13 @@ def generate_functions():
 
                 f.write("        match word:\n")
                 for word in Semantics:
-                    f.write("            case Semantics." + word.name + ":\n")
+                    if bool(decoration[word.value]):  # Checking if there is operations for this word
+                        f.write("            case Semantics." + word.name + ":\n")
                     operations = decoration[word.value]
                     for operation in operations:
                         f.write("                " + prepare_operation_line(operation, g, phi_f) + "\n")
 
+                f.write("\n    return " + g + "(R, C)\n")
                 f.write("\n\n")
 
     f.close()
