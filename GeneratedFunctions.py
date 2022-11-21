@@ -2,8 +2,8 @@ from math import inf
 from Enums.Patterns import Patterns
 from TimeSerieParser import *
 
-def pos_max_max_bump_on_decreasing_sequence(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_max_bump_on_decreasing_sequence(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.BUMP_ON_DECREASING_SEQUENCE)
     default_g_f = -inf
     neutral_f = -inf
@@ -13,7 +13,7 @@ def pos_max_max_bump_on_decreasing_sequence(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -37,8 +37,8 @@ def pos_max_max_bump_on_decreasing_sequence(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_max_decreasing(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_max_decreasing(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.DECREASING)
     default_g_f = -inf
     neutral_f = -inf
@@ -48,7 +48,7 @@ def pos_max_max_decreasing(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -72,8 +72,8 @@ def pos_max_max_decreasing(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_max_decreasing_sequence(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_max_decreasing_sequence(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.DECREASING_SEQUENCE)
     default_g_f = -inf
     neutral_f = -inf
@@ -83,7 +83,7 @@ def pos_max_max_decreasing_sequence(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -107,8 +107,8 @@ def pos_max_max_decreasing_sequence(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_max_decreasing_terrace(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_max_decreasing_terrace(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.DECREASING_TERRACE)
     default_g_f = -inf
     neutral_f = -inf
@@ -118,7 +118,7 @@ def pos_max_max_decreasing_terrace(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -142,8 +142,8 @@ def pos_max_max_decreasing_terrace(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_max_dip_on_increasing_sequence(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_max_dip_on_increasing_sequence(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.DIP_ON_INCREASING_SEQUENCE)
     default_g_f = -inf
     neutral_f = -inf
@@ -153,7 +153,7 @@ def pos_max_max_dip_on_increasing_sequence(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -177,8 +177,8 @@ def pos_max_max_dip_on_increasing_sequence(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_max_gorge(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_max_gorge(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.GORGE)
     default_g_f = -inf
     neutral_f = -inf
@@ -188,7 +188,7 @@ def pos_max_max_gorge(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -212,8 +212,8 @@ def pos_max_max_gorge(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_max_increasing(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_max_increasing(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.INCREASING)
     default_g_f = -inf
     neutral_f = -inf
@@ -223,7 +223,7 @@ def pos_max_max_increasing(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -247,8 +247,8 @@ def pos_max_max_increasing(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_max_increasing_sequence(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_max_increasing_sequence(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.INCREASING_SEQUENCE)
     default_g_f = -inf
     neutral_f = -inf
@@ -258,7 +258,7 @@ def pos_max_max_increasing_sequence(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -282,8 +282,8 @@ def pos_max_max_increasing_sequence(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_max_increasing_terrace(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_max_increasing_terrace(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.INCREASING_TERRACE)
     default_g_f = -inf
     neutral_f = -inf
@@ -293,7 +293,7 @@ def pos_max_max_increasing_terrace(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -317,8 +317,8 @@ def pos_max_max_increasing_terrace(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_max_inflexion(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_max_inflexion(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.INFLEXION)
     default_g_f = -inf
     neutral_f = -inf
@@ -328,7 +328,7 @@ def pos_max_max_inflexion(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -352,8 +352,8 @@ def pos_max_max_inflexion(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_max_peak(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_max_peak(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.PEAK)
     default_g_f = -inf
     neutral_f = -inf
@@ -363,7 +363,7 @@ def pos_max_max_peak(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -387,8 +387,8 @@ def pos_max_max_peak(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_max_plain(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_max_plain(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.PLAIN)
     default_g_f = -inf
     neutral_f = -inf
@@ -398,7 +398,7 @@ def pos_max_max_plain(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -422,8 +422,8 @@ def pos_max_max_plain(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_max_plateau(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_max_plateau(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.PLATEAU)
     default_g_f = -inf
     neutral_f = -inf
@@ -433,7 +433,7 @@ def pos_max_max_plateau(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -457,8 +457,8 @@ def pos_max_max_plateau(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_max_proper_plain(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_max_proper_plain(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.PROPER_PLAIN)
     default_g_f = -inf
     neutral_f = -inf
@@ -468,7 +468,7 @@ def pos_max_max_proper_plain(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -492,8 +492,8 @@ def pos_max_max_proper_plain(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_max_proper_plateau(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_max_proper_plateau(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.PROPER_PLATEAU)
     default_g_f = -inf
     neutral_f = -inf
@@ -503,7 +503,7 @@ def pos_max_max_proper_plateau(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -527,8 +527,8 @@ def pos_max_max_proper_plateau(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_max_steady(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_max_steady(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.STEADY)
     default_g_f = -inf
     neutral_f = -inf
@@ -538,7 +538,7 @@ def pos_max_max_steady(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -562,8 +562,8 @@ def pos_max_max_steady(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_max_steady_seaquence(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_max_steady_seaquence(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.STEADY_SEQUENCE)
     default_g_f = -inf
     neutral_f = -inf
@@ -573,7 +573,7 @@ def pos_max_max_steady_seaquence(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -597,8 +597,8 @@ def pos_max_max_steady_seaquence(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_max_strictly_decreasing(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_max_strictly_decreasing(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.STRICTLY_DECREASING_SEQUENCE)
     default_g_f = -inf
     neutral_f = -inf
@@ -608,7 +608,7 @@ def pos_max_max_strictly_decreasing(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -632,8 +632,8 @@ def pos_max_max_strictly_decreasing(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_max_strictly_increasing(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_max_strictly_increasing(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.STRICTLY_INCREASING_SEQUENCE)
     default_g_f = -inf
     neutral_f = -inf
@@ -643,7 +643,7 @@ def pos_max_max_strictly_increasing(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -667,8 +667,8 @@ def pos_max_max_strictly_increasing(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_max_summit(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_max_summit(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.SUMMIT)
     default_g_f = -inf
     neutral_f = -inf
@@ -678,7 +678,7 @@ def pos_max_max_summit(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -702,8 +702,8 @@ def pos_max_max_summit(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_max_valley(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_max_valley(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.VALLEY)
     default_g_f = -inf
     neutral_f = -inf
@@ -713,7 +713,7 @@ def pos_max_max_valley(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -737,8 +737,8 @@ def pos_max_max_valley(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_max_zigzag(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_max_zigzag(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.ZIGZAG)
     default_g_f = -inf
     neutral_f = -inf
@@ -748,7 +748,7 @@ def pos_max_max_zigzag(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -772,8 +772,8 @@ def pos_max_max_zigzag(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_min_bump_on_decreasing_sequence(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_min_bump_on_decreasing_sequence(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.BUMP_ON_DECREASING_SEQUENCE)
     default_g_f = -inf
     neutral_f = inf
@@ -783,7 +783,7 @@ def pos_max_min_bump_on_decreasing_sequence(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -807,8 +807,8 @@ def pos_max_min_bump_on_decreasing_sequence(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_min_decreasing(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_min_decreasing(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.DECREASING)
     default_g_f = -inf
     neutral_f = inf
@@ -818,7 +818,7 @@ def pos_max_min_decreasing(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -842,8 +842,8 @@ def pos_max_min_decreasing(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_min_decreasing_sequence(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_min_decreasing_sequence(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.DECREASING_SEQUENCE)
     default_g_f = -inf
     neutral_f = inf
@@ -853,7 +853,7 @@ def pos_max_min_decreasing_sequence(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -877,8 +877,8 @@ def pos_max_min_decreasing_sequence(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_min_decreasing_terrace(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_min_decreasing_terrace(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.DECREASING_TERRACE)
     default_g_f = -inf
     neutral_f = inf
@@ -888,7 +888,7 @@ def pos_max_min_decreasing_terrace(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -912,8 +912,8 @@ def pos_max_min_decreasing_terrace(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_min_dip_on_increasing_sequence(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_min_dip_on_increasing_sequence(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.DIP_ON_INCREASING_SEQUENCE)
     default_g_f = -inf
     neutral_f = inf
@@ -923,7 +923,7 @@ def pos_max_min_dip_on_increasing_sequence(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -947,8 +947,8 @@ def pos_max_min_dip_on_increasing_sequence(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_min_gorge(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_min_gorge(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.GORGE)
     default_g_f = -inf
     neutral_f = inf
@@ -958,7 +958,7 @@ def pos_max_min_gorge(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -982,8 +982,8 @@ def pos_max_min_gorge(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_min_increasing(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_min_increasing(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.INCREASING)
     default_g_f = -inf
     neutral_f = inf
@@ -993,7 +993,7 @@ def pos_max_min_increasing(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -1017,8 +1017,8 @@ def pos_max_min_increasing(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_min_increasing_sequence(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_min_increasing_sequence(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.INCREASING_SEQUENCE)
     default_g_f = -inf
     neutral_f = inf
@@ -1028,7 +1028,7 @@ def pos_max_min_increasing_sequence(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -1052,8 +1052,8 @@ def pos_max_min_increasing_sequence(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_min_increasing_terrace(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_min_increasing_terrace(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.INCREASING_TERRACE)
     default_g_f = -inf
     neutral_f = inf
@@ -1063,7 +1063,7 @@ def pos_max_min_increasing_terrace(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -1087,8 +1087,8 @@ def pos_max_min_increasing_terrace(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_min_inflexion(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_min_inflexion(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.INFLEXION)
     default_g_f = -inf
     neutral_f = inf
@@ -1098,7 +1098,7 @@ def pos_max_min_inflexion(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -1122,8 +1122,8 @@ def pos_max_min_inflexion(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_min_peak(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_min_peak(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.PEAK)
     default_g_f = -inf
     neutral_f = inf
@@ -1133,7 +1133,7 @@ def pos_max_min_peak(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -1157,8 +1157,8 @@ def pos_max_min_peak(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_min_plain(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_min_plain(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.PLAIN)
     default_g_f = -inf
     neutral_f = inf
@@ -1168,7 +1168,7 @@ def pos_max_min_plain(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -1192,8 +1192,8 @@ def pos_max_min_plain(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_min_plateau(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_min_plateau(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.PLATEAU)
     default_g_f = -inf
     neutral_f = inf
@@ -1203,7 +1203,7 @@ def pos_max_min_plateau(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -1227,8 +1227,8 @@ def pos_max_min_plateau(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_min_proper_plain(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_min_proper_plain(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.PROPER_PLAIN)
     default_g_f = -inf
     neutral_f = inf
@@ -1238,7 +1238,7 @@ def pos_max_min_proper_plain(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -1262,8 +1262,8 @@ def pos_max_min_proper_plain(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_min_proper_plateau(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_min_proper_plateau(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.PROPER_PLATEAU)
     default_g_f = -inf
     neutral_f = inf
@@ -1273,7 +1273,7 @@ def pos_max_min_proper_plateau(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -1297,8 +1297,8 @@ def pos_max_min_proper_plateau(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_min_steady(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_min_steady(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.STEADY)
     default_g_f = -inf
     neutral_f = inf
@@ -1308,7 +1308,7 @@ def pos_max_min_steady(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -1332,8 +1332,8 @@ def pos_max_min_steady(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_min_steady_seaquence(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_min_steady_seaquence(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.STEADY_SEQUENCE)
     default_g_f = -inf
     neutral_f = inf
@@ -1343,7 +1343,7 @@ def pos_max_min_steady_seaquence(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -1367,8 +1367,8 @@ def pos_max_min_steady_seaquence(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_min_strictly_decreasing(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_min_strictly_decreasing(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.STRICTLY_DECREASING_SEQUENCE)
     default_g_f = -inf
     neutral_f = inf
@@ -1378,7 +1378,7 @@ def pos_max_min_strictly_decreasing(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -1402,8 +1402,8 @@ def pos_max_min_strictly_decreasing(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_min_strictly_increasing(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_min_strictly_increasing(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.STRICTLY_INCREASING_SEQUENCE)
     default_g_f = -inf
     neutral_f = inf
@@ -1413,7 +1413,7 @@ def pos_max_min_strictly_increasing(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -1437,8 +1437,8 @@ def pos_max_min_strictly_increasing(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_min_summit(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_min_summit(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.SUMMIT)
     default_g_f = -inf
     neutral_f = inf
@@ -1448,7 +1448,7 @@ def pos_max_min_summit(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -1472,8 +1472,8 @@ def pos_max_min_summit(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_min_valley(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_min_valley(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.VALLEY)
     default_g_f = -inf
     neutral_f = inf
@@ -1483,7 +1483,7 @@ def pos_max_min_valley(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -1507,8 +1507,8 @@ def pos_max_min_valley(time_serie):
             case Semantics.OUT:
 
 
-def pos_max_min_zigzag(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_max_min_zigzag(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.ZIGZAG)
     default_g_f = -inf
     neutral_f = inf
@@ -1518,7 +1518,7 @@ def pos_max_min_zigzag(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -1542,8 +1542,8 @@ def pos_max_min_zigzag(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_max_bump_on_decreasing_sequence(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_max_bump_on_decreasing_sequence(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.BUMP_ON_DECREASING_SEQUENCE)
     default_g_f = inf
     neutral_f = -inf
@@ -1553,7 +1553,7 @@ def pos_min_max_bump_on_decreasing_sequence(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -1577,8 +1577,8 @@ def pos_min_max_bump_on_decreasing_sequence(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_max_decreasing(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_max_decreasing(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.DECREASING)
     default_g_f = inf
     neutral_f = -inf
@@ -1588,7 +1588,7 @@ def pos_min_max_decreasing(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -1612,8 +1612,8 @@ def pos_min_max_decreasing(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_max_decreasing_sequence(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_max_decreasing_sequence(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.DECREASING_SEQUENCE)
     default_g_f = inf
     neutral_f = -inf
@@ -1623,7 +1623,7 @@ def pos_min_max_decreasing_sequence(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -1647,8 +1647,8 @@ def pos_min_max_decreasing_sequence(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_max_decreasing_terrace(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_max_decreasing_terrace(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.DECREASING_TERRACE)
     default_g_f = inf
     neutral_f = -inf
@@ -1658,7 +1658,7 @@ def pos_min_max_decreasing_terrace(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -1682,8 +1682,8 @@ def pos_min_max_decreasing_terrace(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_max_dip_on_increasing_sequence(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_max_dip_on_increasing_sequence(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.DIP_ON_INCREASING_SEQUENCE)
     default_g_f = inf
     neutral_f = -inf
@@ -1693,7 +1693,7 @@ def pos_min_max_dip_on_increasing_sequence(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -1717,8 +1717,8 @@ def pos_min_max_dip_on_increasing_sequence(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_max_gorge(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_max_gorge(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.GORGE)
     default_g_f = inf
     neutral_f = -inf
@@ -1728,7 +1728,7 @@ def pos_min_max_gorge(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -1752,8 +1752,8 @@ def pos_min_max_gorge(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_max_increasing(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_max_increasing(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.INCREASING)
     default_g_f = inf
     neutral_f = -inf
@@ -1763,7 +1763,7 @@ def pos_min_max_increasing(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -1787,8 +1787,8 @@ def pos_min_max_increasing(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_max_increasing_sequence(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_max_increasing_sequence(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.INCREASING_SEQUENCE)
     default_g_f = inf
     neutral_f = -inf
@@ -1798,7 +1798,7 @@ def pos_min_max_increasing_sequence(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -1822,8 +1822,8 @@ def pos_min_max_increasing_sequence(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_max_increasing_terrace(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_max_increasing_terrace(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.INCREASING_TERRACE)
     default_g_f = inf
     neutral_f = -inf
@@ -1833,7 +1833,7 @@ def pos_min_max_increasing_terrace(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -1857,8 +1857,8 @@ def pos_min_max_increasing_terrace(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_max_inflexion(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_max_inflexion(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.INFLEXION)
     default_g_f = inf
     neutral_f = -inf
@@ -1868,7 +1868,7 @@ def pos_min_max_inflexion(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -1892,8 +1892,8 @@ def pos_min_max_inflexion(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_max_peak(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_max_peak(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.PEAK)
     default_g_f = inf
     neutral_f = -inf
@@ -1903,7 +1903,7 @@ def pos_min_max_peak(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -1927,8 +1927,8 @@ def pos_min_max_peak(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_max_plain(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_max_plain(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.PLAIN)
     default_g_f = inf
     neutral_f = -inf
@@ -1938,7 +1938,7 @@ def pos_min_max_plain(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -1962,8 +1962,8 @@ def pos_min_max_plain(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_max_plateau(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_max_plateau(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.PLATEAU)
     default_g_f = inf
     neutral_f = -inf
@@ -1973,7 +1973,7 @@ def pos_min_max_plateau(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -1997,8 +1997,8 @@ def pos_min_max_plateau(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_max_proper_plain(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_max_proper_plain(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.PROPER_PLAIN)
     default_g_f = inf
     neutral_f = -inf
@@ -2008,7 +2008,7 @@ def pos_min_max_proper_plain(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -2032,8 +2032,8 @@ def pos_min_max_proper_plain(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_max_proper_plateau(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_max_proper_plateau(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.PROPER_PLATEAU)
     default_g_f = inf
     neutral_f = -inf
@@ -2043,7 +2043,7 @@ def pos_min_max_proper_plateau(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -2067,8 +2067,8 @@ def pos_min_max_proper_plateau(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_max_steady(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_max_steady(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.STEADY)
     default_g_f = inf
     neutral_f = -inf
@@ -2078,7 +2078,7 @@ def pos_min_max_steady(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -2102,8 +2102,8 @@ def pos_min_max_steady(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_max_steady_seaquence(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_max_steady_seaquence(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.STEADY_SEQUENCE)
     default_g_f = inf
     neutral_f = -inf
@@ -2113,7 +2113,7 @@ def pos_min_max_steady_seaquence(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -2137,8 +2137,8 @@ def pos_min_max_steady_seaquence(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_max_strictly_decreasing(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_max_strictly_decreasing(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.STRICTLY_DECREASING_SEQUENCE)
     default_g_f = inf
     neutral_f = -inf
@@ -2148,7 +2148,7 @@ def pos_min_max_strictly_decreasing(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -2172,8 +2172,8 @@ def pos_min_max_strictly_decreasing(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_max_strictly_increasing(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_max_strictly_increasing(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.STRICTLY_INCREASING_SEQUENCE)
     default_g_f = inf
     neutral_f = -inf
@@ -2183,7 +2183,7 @@ def pos_min_max_strictly_increasing(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -2207,8 +2207,8 @@ def pos_min_max_strictly_increasing(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_max_summit(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_max_summit(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.SUMMIT)
     default_g_f = inf
     neutral_f = -inf
@@ -2218,7 +2218,7 @@ def pos_min_max_summit(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -2242,8 +2242,8 @@ def pos_min_max_summit(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_max_valley(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_max_valley(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.VALLEY)
     default_g_f = inf
     neutral_f = -inf
@@ -2253,7 +2253,7 @@ def pos_min_max_valley(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -2277,8 +2277,8 @@ def pos_min_max_valley(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_max_zigzag(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_max_zigzag(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.ZIGZAG)
     default_g_f = inf
     neutral_f = -inf
@@ -2288,7 +2288,7 @@ def pos_min_max_zigzag(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = max(float(D), float(delta_f))
@@ -2312,8 +2312,8 @@ def pos_min_max_zigzag(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_min_bump_on_decreasing_sequence(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_min_bump_on_decreasing_sequence(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.BUMP_ON_DECREASING_SEQUENCE)
     default_g_f = inf
     neutral_f = inf
@@ -2323,7 +2323,7 @@ def pos_min_min_bump_on_decreasing_sequence(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -2347,8 +2347,8 @@ def pos_min_min_bump_on_decreasing_sequence(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_min_decreasing(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_min_decreasing(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.DECREASING)
     default_g_f = inf
     neutral_f = inf
@@ -2358,7 +2358,7 @@ def pos_min_min_decreasing(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -2382,8 +2382,8 @@ def pos_min_min_decreasing(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_min_decreasing_sequence(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_min_decreasing_sequence(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.DECREASING_SEQUENCE)
     default_g_f = inf
     neutral_f = inf
@@ -2393,7 +2393,7 @@ def pos_min_min_decreasing_sequence(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -2417,8 +2417,8 @@ def pos_min_min_decreasing_sequence(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_min_decreasing_terrace(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_min_decreasing_terrace(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.DECREASING_TERRACE)
     default_g_f = inf
     neutral_f = inf
@@ -2428,7 +2428,7 @@ def pos_min_min_decreasing_terrace(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -2452,8 +2452,8 @@ def pos_min_min_decreasing_terrace(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_min_dip_on_increasing_sequence(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_min_dip_on_increasing_sequence(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.DIP_ON_INCREASING_SEQUENCE)
     default_g_f = inf
     neutral_f = inf
@@ -2463,7 +2463,7 @@ def pos_min_min_dip_on_increasing_sequence(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -2487,8 +2487,8 @@ def pos_min_min_dip_on_increasing_sequence(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_min_gorge(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_min_gorge(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.GORGE)
     default_g_f = inf
     neutral_f = inf
@@ -2498,7 +2498,7 @@ def pos_min_min_gorge(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -2522,8 +2522,8 @@ def pos_min_min_gorge(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_min_increasing(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_min_increasing(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.INCREASING)
     default_g_f = inf
     neutral_f = inf
@@ -2533,7 +2533,7 @@ def pos_min_min_increasing(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -2557,8 +2557,8 @@ def pos_min_min_increasing(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_min_increasing_sequence(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_min_increasing_sequence(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.INCREASING_SEQUENCE)
     default_g_f = inf
     neutral_f = inf
@@ -2568,7 +2568,7 @@ def pos_min_min_increasing_sequence(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -2592,8 +2592,8 @@ def pos_min_min_increasing_sequence(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_min_increasing_terrace(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_min_increasing_terrace(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.INCREASING_TERRACE)
     default_g_f = inf
     neutral_f = inf
@@ -2603,7 +2603,7 @@ def pos_min_min_increasing_terrace(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -2627,8 +2627,8 @@ def pos_min_min_increasing_terrace(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_min_inflexion(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_min_inflexion(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.INFLEXION)
     default_g_f = inf
     neutral_f = inf
@@ -2638,7 +2638,7 @@ def pos_min_min_inflexion(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -2662,8 +2662,8 @@ def pos_min_min_inflexion(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_min_peak(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_min_peak(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.PEAK)
     default_g_f = inf
     neutral_f = inf
@@ -2673,7 +2673,7 @@ def pos_min_min_peak(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -2697,8 +2697,8 @@ def pos_min_min_peak(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_min_plain(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_min_plain(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.PLAIN)
     default_g_f = inf
     neutral_f = inf
@@ -2708,7 +2708,7 @@ def pos_min_min_plain(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -2732,8 +2732,8 @@ def pos_min_min_plain(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_min_plateau(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_min_plateau(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.PLATEAU)
     default_g_f = inf
     neutral_f = inf
@@ -2743,7 +2743,7 @@ def pos_min_min_plateau(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -2767,8 +2767,8 @@ def pos_min_min_plateau(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_min_proper_plain(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_min_proper_plain(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.PROPER_PLAIN)
     default_g_f = inf
     neutral_f = inf
@@ -2778,7 +2778,7 @@ def pos_min_min_proper_plain(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -2802,8 +2802,8 @@ def pos_min_min_proper_plain(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_min_proper_plateau(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_min_proper_plateau(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.PROPER_PLATEAU)
     default_g_f = inf
     neutral_f = inf
@@ -2813,7 +2813,7 @@ def pos_min_min_proper_plateau(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -2837,8 +2837,8 @@ def pos_min_min_proper_plateau(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_min_steady(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_min_steady(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.STEADY)
     default_g_f = inf
     neutral_f = inf
@@ -2848,7 +2848,7 @@ def pos_min_min_steady(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -2872,8 +2872,8 @@ def pos_min_min_steady(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_min_steady_seaquence(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_min_steady_seaquence(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.STEADY_SEQUENCE)
     default_g_f = inf
     neutral_f = inf
@@ -2883,7 +2883,7 @@ def pos_min_min_steady_seaquence(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -2907,8 +2907,8 @@ def pos_min_min_steady_seaquence(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_min_strictly_decreasing(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_min_strictly_decreasing(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.STRICTLY_DECREASING_SEQUENCE)
     default_g_f = inf
     neutral_f = inf
@@ -2918,7 +2918,7 @@ def pos_min_min_strictly_decreasing(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -2942,8 +2942,8 @@ def pos_min_min_strictly_decreasing(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_min_strictly_increasing(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_min_strictly_increasing(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.STRICTLY_INCREASING_SEQUENCE)
     default_g_f = inf
     neutral_f = inf
@@ -2953,7 +2953,7 @@ def pos_min_min_strictly_increasing(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -2977,8 +2977,8 @@ def pos_min_min_strictly_increasing(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_min_summit(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_min_summit(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.SUMMIT)
     default_g_f = inf
     neutral_f = inf
@@ -2988,7 +2988,7 @@ def pos_min_min_summit(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -3012,8 +3012,8 @@ def pos_min_min_summit(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_min_valley(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_min_valley(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.VALLEY)
     default_g_f = inf
     neutral_f = inf
@@ -3023,7 +3023,7 @@ def pos_min_min_valley(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))
@@ -3047,8 +3047,8 @@ def pos_min_min_valley(time_serie):
             case Semantics.OUT:
 
 
-def pos_min_min_zigzag(time_serie):
-    signature = time_serie_to_signature_parser(time_serie)
+def pos_min_min_zigzag(time_series):
+    signature = time_series_to_signature_parser(time_series)
     semantics = signature_to_semantic(signature, Patterns.ZIGZAG)
     default_g_f = inf
     neutral_f = inf
@@ -3058,7 +3058,7 @@ def pos_min_min_zigzag(time_serie):
     D = neutral_f
 
     for word in semantics:
-        delta_f = time_serie[semantics.index(word)]
+        delta_f = time_series[semantics.index(word)]
         match word:
             case Semantics.FOUND:
                 C = min(float(D), float(delta_f))

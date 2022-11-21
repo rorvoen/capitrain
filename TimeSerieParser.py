@@ -1,18 +1,16 @@
 import json
 
 from Enums.Semantics import Semantics
-from Utils import prepare_operation_line
-from math import *
 
-def time_serie_to_signature_parser(time_serie):
+def time_series_to_signature_parser(time_series):
     res = []
     i = 0
-    while i < len(time_serie) - 1:
-        if time_serie[i] > time_serie[i + 1]:
+    while i < len(time_series) - 1:
+        if time_series[i] > time_series[i + 1]:
             res.append(">")
-        elif time_serie[i] < time_serie[i + 1]:
+        elif time_series[i] < time_series[i + 1]:
             res.append("<")
-        elif time_serie[i] == time_serie[i + 1]:
+        elif time_series[i] == time_series[i + 1]:
             res.append("=")
         i += 1
     return res

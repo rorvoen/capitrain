@@ -26,8 +26,8 @@ def generate_functions():
             for pattern in Patterns:
                 f.write("def pos_" + aggregator.lower() + "_" + feature + "_" + pattern.value + "(time_series):\n")
 
-                # Writing the time_serie to signature function call line
-                f.write("    signature = time_serie_to_signature_parser(time_serie)\n")
+                # Writing the time_series to signature function call line
+                f.write("    signature = time_series_to_signature_parser(time_series)\n")
                 # Writing the signature to semantics function call line
                 f.write("    semantics = signature_to_semantic(signature, Patterns." + pattern.name + ")\n")
 
