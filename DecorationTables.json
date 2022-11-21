@@ -1,0 +1,57 @@
+{
+  "tables": {
+    "features": {
+      "max": {
+        "neutral_f": "-inf",
+        "min_f": "-inf",
+        "max_f": "inf",
+        "phi_f": "max",
+        "delta_f": "x_i"
+      },
+      "min": {
+        "neutral_f": "inf",
+        "min_f": "-inf",
+        "max_f": "inf",
+        "phi_f": "min",
+        "delta_f": "x_i"
+      }
+    },
+    "aggregators": {
+      "Max": {
+        "default_g_f": "min_f"
+      },
+      "Min": {
+        "default_g_f": "max_f"
+      }
+    },
+    "decoration": {
+      "out_r": [
+        {"acc": "D","operator": "affect","value1": "neutral_f"}
+      ],
+      "out_a":[
+        {"acc": "R","operator": "g","value1": "R","value2": "C"},
+        {"acc": "C","operator": "affect","value1": "default_g_f"},
+        {"acc": "D","operator": "affect","value1": "neutral_f"}
+      ],
+      "maybe_b": [
+        {"acc": "D","operator": "phi_f","value1": "D","value2": "delta_f"}
+      ],
+      "maybe_a": [
+        {"acc": "D","operator": "phi_f","value1": "D","value2": "delta_f"}
+      ],
+      "found": [
+        {"acc": "C","operator": "phi_f","value1": "D","value2": "delta_f"},
+        {"acc": "D","operator": "affect","value1": "neutral_f"}
+      ],
+      "found_e": [
+        {"acc": "R","operator": "g","value1": "R,","value2": {"operator": "phi_f","value1": "D","value2": "delta_f"}},
+        {"acc": "D","operator": "affect","value1": "neutral_f"}
+      ],
+      "in": [
+        {"acc": "C","operator": "phi_f","value1": "C","value2": {"operator": "phi_f","value1": "D","value2": "delta_f"}},
+        {"acc": "D","operator": "affect","value1": "neutral_f"}
+      ],
+      "out":[]
+    }
+  }
+}

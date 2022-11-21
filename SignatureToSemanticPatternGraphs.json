@@ -1,0 +1,1384 @@
+{
+  "graphs": {
+    "bump_on_decreasing_sequence": {
+      "entryState": "s",
+      "states": {
+        "s": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "s",
+              "consume": "<",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "out"
+            },
+            {
+              "to": "r",
+              "consume": ">",
+              "produce": "out"
+            }
+          ]
+        },
+        "r": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "s",
+              "consume": "<",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "out"
+            },
+            {
+              "to": "t",
+              "consume": ">",
+              "produce": "out"
+            }
+          ]
+        },
+        "t": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "u",
+              "consume": "<",
+              "produce": "maybe_b"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "out"
+            },
+            {
+              "to": "t",
+              "consume": ">",
+              "produce": "out"
+            }
+          ]
+        },
+        "v": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "s",
+              "consume": "<",
+              "produce": "out_r"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "out_r"
+            },
+            {
+              "to": "t",
+              "consume": ">",
+              "produce": "found_e"
+            }
+          ]
+        },
+        "u": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "s",
+              "consume": "<",
+              "produce": "out_r"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "out_r"
+            },
+            {
+              "to": "v",
+              "consume": ">",
+              "produce": "maybe_b"
+            }
+          ]
+        }
+      }
+    },
+    "decreasing": {
+      "entryState": "s",
+      "states": {
+        "s": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "s",
+              "consume": "<",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": ">",
+              "produce": "found_e"
+            }
+          ]
+        }
+      }
+    },
+    "decreasing_sequence": {
+      "entryState": "s",
+      "states": {
+        "s": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "s",
+              "consume": "<",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "out"
+            },
+            {
+              "to": "t",
+              "consume": ">",
+              "produce": "found"
+            }
+          ]
+        },
+        "t": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "s",
+              "consume": "<",
+              "produce": "out_a"
+            },
+            {
+              "to": "t",
+              "consume": "=",
+              "produce": "maybe_a"
+            },
+            {
+              "to": "t",
+              "consume": ">",
+              "produce": "in"
+            }
+          ]
+        }
+      }
+    },
+    "decreasing_terrace": {
+      "entryState": "s",
+      "states": {
+        "s": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "s",
+              "consume": "<",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "out"
+            },
+            {
+              "to": "r",
+              "consume": ">",
+              "produce": "out"
+            }
+          ]
+        },
+        "t": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "s",
+              "consume": "<",
+              "produce": "out_r"
+            },
+            {
+              "to": "t",
+              "consume": "=",
+              "produce": "maybe_b"
+            },
+            {
+              "to": "r",
+              "consume": ">",
+              "produce": "found_e"
+            }
+          ]
+        },
+        "r": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "s",
+              "consume": "<",
+              "produce": "out"
+            },
+            {
+              "to": "t",
+              "consume": "=",
+              "produce": "maybe_b"
+            },
+            {
+              "to": "r",
+              "consume": ">",
+              "produce": "out"
+            }
+          ]
+        }
+      }
+    },
+    "dip_on_increasing_sequence": {
+      "entryState": "s",
+      "states": {
+        "s": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "r",
+              "consume": "<",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": ">",
+              "produce": "out"
+            }
+          ]
+        },
+        "r": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "t",
+              "consume": "<",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": ">",
+              "produce": "out"
+            }
+          ]
+        },
+        "t": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "t",
+              "consume": "<",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "out"
+            },
+            {
+              "to": "u",
+              "consume": ">",
+              "produce": "maybe_b"
+            }
+          ]
+        },
+        "v": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "t",
+              "consume": "<",
+              "produce": "found_e"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "out_r"
+            },
+            {
+              "to": "s",
+              "consume": ">",
+              "produce": "out_r"
+            }
+          ]
+        },
+        "u": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "v",
+              "consume": "<",
+              "produce": "maybe_b"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": ">",
+              "produce": "out_r"
+            }
+          ]
+        }
+      }
+    },
+    "gorge": {
+      "entryState": "s",
+      "states": {
+        "s": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "s",
+              "consume": "<",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "out"
+            },
+            {
+              "to": "r",
+              "consume": ">",
+              "produce": "out"
+            }
+          ]
+        },
+        "r": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "t",
+              "consume": "<",
+              "produce": "found"
+            },
+            {
+              "to": "u",
+              "consume": "=",
+              "produce": "maybe_b"
+            },
+            {
+              "to": "r",
+              "consume": ">",
+              "produce": "maybe_b"
+            }
+          ]
+        },
+        "t": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "t",
+              "consume": "<",
+              "produce": "in"
+            },
+            {
+              "to": "t",
+              "consume": "=",
+              "produce": "maybe_a"
+            },
+            {
+              "to": "r",
+              "consume": ">",
+              "produce": "out_a"
+            }
+          ]
+        },
+        "u": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "s",
+              "consume": "<",
+              "produce": "out_r"
+            },
+            {
+              "to": "u",
+              "consume": "=",
+              "produce": "maybe_b"
+            },
+            {
+              "to": "r",
+              "consume": ">",
+              "produce": "maybe_b"
+            }
+          ]
+        }
+      }
+    },
+    "increasing": {
+      "entryState": "s",
+      "states": {
+        "s": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "s",
+              "consume": "<",
+              "produce": "found_e"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": ">",
+              "produce": "out"
+            }
+          ]
+        }
+      }
+    },
+    "increasing_sequence": {
+      "entryState": "s",
+      "states": {
+        "s": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "t",
+              "consume": "<",
+              "produce": "found"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": ">",
+              "produce": "out"
+            }
+          ]
+        },
+        "t": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "t",
+              "consume": "<",
+              "produce": "in"
+            },
+            {
+              "to": "t",
+              "consume": "=",
+              "produce": "maybe_a"
+            },
+            {
+              "to": "s",
+              "consume": ">",
+              "produce": "out_a"
+            }
+          ]
+        }
+      }
+    },
+    "increasing_terrace": {
+      "entryState": "s",
+      "states": {
+        "s": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "r",
+              "consume": "<",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": ">",
+              "produce": "out"
+            }
+          ]
+        },
+        "r": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "r",
+              "consume": "<",
+              "produce": "out"
+            },
+            {
+              "to": "t",
+              "consume": "=",
+              "produce": "maybe_b"
+            },
+            {
+              "to": "s",
+              "consume": ">",
+              "produce": "out"
+            }
+          ]
+        },
+        "t": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "r",
+              "consume": "<",
+              "produce": "found_e"
+            },
+            {
+              "to": "t",
+              "consume": "=",
+              "produce": "maybe_b"
+            },
+            {
+              "to": "s",
+              "consume": ">",
+              "produce": "out_r"
+            }
+          ]
+        }
+      }
+    },
+    "inflexion": {
+      "entryState": "s",
+      "states": {
+        "s": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "r",
+              "consume": "<",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "out"
+            },
+            {
+              "to": "t",
+              "consume": ">",
+              "produce": "out"
+            }
+          ]
+        },
+        "r": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "r",
+              "consume": "<",
+              "produce": "maybe_b"
+            },
+            {
+              "to": "r",
+              "consume": "=",
+              "produce": "maybe_b"
+            },
+            {
+              "to": "t",
+              "consume": ">",
+              "produce": "found_e"
+            }
+          ]
+        },
+        "t": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "r",
+              "consume": "<",
+              "produce": "found_e"
+            },
+            {
+              "to": "t",
+              "consume": "=",
+              "produce": "maybe_b"
+            },
+            {
+              "to": "t",
+              "consume": ">",
+              "produce": "maybe_b"
+            }
+          ]
+        }
+      }
+    },
+    "peak": {
+      "entryState": "s",
+      "states": {
+        "s": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "r",
+              "consume": "<",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": ">",
+              "produce": "out"
+            }
+          ]
+        },
+        "r": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "r",
+              "consume": "<",
+              "produce": "maybe_b"
+            },
+            {
+              "to": "r",
+              "consume": "=",
+              "produce": "maybe_b"
+            },
+            {
+              "to": "t",
+              "consume": ">",
+              "produce": "found"
+            }
+          ]
+        },
+        "t": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "r",
+              "consume": "<",
+              "produce": "out_a"
+            },
+            {
+              "to": "t",
+              "consume": "=",
+              "produce": "maybe_a"
+            },
+            {
+              "to": "t",
+              "consume": ">",
+              "produce": "in"
+            }
+          ]
+        }
+      }
+    },
+    "plain": {
+      "entryState": "s",
+      "states": {
+        "s": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "s",
+              "consume": "<",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "out"
+            },
+            {
+              "to": "r",
+              "consume": ">",
+              "produce": "out"
+            }
+          ]
+        },
+        "r": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "s",
+              "consume": "<",
+              "produce": "found_e"
+            },
+            {
+              "to": "t",
+              "consume": "=",
+              "produce": "maybe_b"
+            },
+            {
+              "to": "r",
+              "consume": ">",
+              "produce": "out"
+            }
+          ]
+        },
+        "t": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "s",
+              "consume": "<",
+              "produce": "found_e"
+            },
+            {
+              "to": "t",
+              "consume": "=",
+              "produce": "maybe_b"
+            },
+            {
+              "to": "r",
+              "consume": ">",
+              "produce": "out_r"
+            }
+          ]
+        }
+      }
+    },
+    "plateau": {
+      "entryState": "s",
+      "states": {
+        "s": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "r",
+              "consume": "<",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": ">",
+              "produce": "out"
+            }
+          ]
+        },
+        "r": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "r",
+              "consume": "<",
+              "produce": "out"
+            },
+            {
+              "to": "t",
+              "consume": "=",
+              "produce": "maybe_b"
+            },
+            {
+              "to": "s",
+              "consume": ">",
+              "produce": "found_e"
+            }
+          ]
+        },
+        "t": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "r",
+              "consume": "<",
+              "produce": "out_r"
+            },
+            {
+              "to": "t",
+              "consume": "=",
+              "produce": "maybe_b"
+            },
+            {
+              "to": "s",
+              "consume": ">",
+              "produce": "found_e"
+            }
+          ]
+        }
+      }
+    },
+    "proper_plain": {
+      "entryState": "s",
+      "states": {
+        "s": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "s",
+              "consume": "<",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "out"
+            },
+            {
+              "to": "r",
+              "consume": ">",
+              "produce": "out"
+            }
+          ]
+        },
+        "r": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "s",
+              "consume": "<",
+              "produce": "out"
+            },
+            {
+              "to": "t",
+              "consume": "=",
+              "produce": "maybe_b"
+            },
+            {
+              "to": "r",
+              "consume": ">",
+              "produce": "out"
+            }
+          ]
+        },
+        "t": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "s",
+              "consume": "<",
+              "produce": "found_e"
+            },
+            {
+              "to": "t",
+              "consume": "=",
+              "produce": "maybe_b"
+            },
+            {
+              "to": "r",
+              "consume": ">",
+              "produce": "out_r"
+            }
+          ]
+        }
+      }
+    },
+    "proper_plateau": {
+      "entryState": "s",
+      "states": {
+        "s": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "r",
+              "consume": "<",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": ">",
+              "produce": "out"
+            }
+          ]
+        },
+        "r": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "r",
+              "consume": "<",
+              "produce": "out"
+            },
+            {
+              "to": "t",
+              "consume": "=",
+              "produce": "maybe_b"
+            },
+            {
+              "to": "s",
+              "consume": ">",
+              "produce": "out"
+            }
+          ]
+        },
+        "t": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "r",
+              "consume": "<",
+              "produce": "out_r"
+            },
+            {
+              "to": "t",
+              "consume": "=",
+              "produce": "maybe_b"
+            },
+            {
+              "to": "s",
+              "consume": ">",
+              "produce": "found_e"
+            }
+          ]
+        }
+      }
+    },
+    "steady": {
+      "entryState": "s",
+      "states": {
+        "s": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "s",
+              "consume": "<",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "found_e"
+            },
+            {
+              "to": "s",
+              "consume": ">",
+              "produce": "out"
+            }
+          ]
+        }
+      }
+    },
+    "steady_sequence": {
+      "entryState": "s",
+      "states": {
+        "s": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "s",
+              "consume": "<",
+              "produce": "out"
+            },
+            {
+              "to": "r",
+              "consume": "=",
+              "produce": "found"
+            },
+            {
+              "to": "s",
+              "consume": ">",
+              "produce": "out"
+            }
+          ]
+        },
+        "r": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "s",
+              "consume": "<",
+              "produce": "out_a"
+            },
+            {
+              "to": "r",
+              "consume": "=",
+              "produce": "in"
+            },
+            {
+              "to": "s",
+              "consume": ">",
+              "produce": "out_a"
+            }
+          ]
+        }
+        }
+      },
+    "strictly_decreasing_sequence": {
+      "entryState": "s",
+      "states": {
+        "s": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "s",
+              "consume": "<",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "out"
+            },
+            {
+              "to": "r",
+              "consume": ">",
+              "produce": "found"
+            }
+          ]
+        },
+        "r": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "s",
+              "consume": "<",
+              "produce": "out_a"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "out_a"
+            },
+            {
+              "to": "r",
+              "consume": ">",
+              "produce": "in"
+            }
+          ]
+        }
+        }
+      },
+    "strictly_increasing_sequence": {
+      "entryState": "s",
+      "states": {
+        "s": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "r",
+              "consume": "<",
+              "produce": "found"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": ">",
+              "produce": "out"
+            }
+          ]
+        },
+        "r": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "r",
+              "consume": "<",
+              "produce": "in"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "out_a"
+            },
+            {
+              "to": "s",
+              "consume": ">",
+              "produce": "out_a"
+            }
+          ]
+        }
+        }
+      },
+    "summit": {
+      "entryState": "s",
+      "states": {
+        "s": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "r",
+              "consume": "<",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": ">",
+              "produce": "out"
+            }
+          ]
+        },
+        "r": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "r",
+              "consume": "<",
+              "produce": "maybe_b"
+            },
+            {
+              "to": "u",
+              "consume": "=",
+              "produce": "maybe_b"
+            },
+            {
+              "to": "t",
+              "consume": ">",
+              "produce": "found"
+            }
+          ]
+        },
+        "t": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "r",
+              "consume": "<",
+              "produce": "out_a"
+            },
+            {
+              "to": "t",
+              "consume": "=",
+              "produce": "maybe_a"
+            },
+            {
+              "to": "t",
+              "consume": ">",
+              "produce": "in"
+            }
+          ]
+        },
+        "u": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "r",
+              "consume": "<",
+              "produce": "maybe_b"
+            },
+            {
+              "to": "u",
+              "consume": "=",
+              "produce": "maybe_b"
+            },
+            {
+              "to": "s",
+              "consume": ">",
+              "produce": "out_r"
+            }
+          ]
+        }
+      }
+    },
+    "valley": {
+      "entryState": "s",
+      "states": {
+        "s": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "s",
+              "consume": "<",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "out"
+            },
+            {
+              "to": "r",
+              "consume": ">",
+              "produce": "out"
+            }
+          ]
+        },
+        "r": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "t",
+              "consume": "<",
+              "produce": "found"
+            },
+            {
+              "to": "r",
+              "consume": "=",
+              "produce": "maybe_b"
+            },
+            {
+              "to": "r",
+              "consume": ">",
+              "produce": "maybe_b"
+            }
+          ]
+        },
+        "t": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "t",
+              "consume": "<",
+              "produce": "in"
+            },
+            {
+              "to": "t",
+              "consume": "=",
+              "produce": "maybe_a"
+            },
+            {
+              "to": "r",
+              "consume": ">",
+              "produce": "out_a"
+            }
+          ]
+        }
+      }
+    },
+    "zigzag": {
+      "entryState": "s",
+      "states": {
+        "s": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "a",
+              "consume": "<",
+              "produce": "out"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "out"
+            },
+            {
+              "to": "d",
+              "consume": ">",
+              "produce": "out"
+            }
+          ]
+        },
+        "a": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "a",
+              "consume": "<",
+              "produce": "out"
+            },
+            {
+              "to": "b",
+              "consume": ">",
+              "produce": "maybe_b"
+            }
+          ]
+        },
+        "b": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "c",
+              "consume": "<",
+              "produce": "found"
+            },
+            {
+              "to": "d",
+              "consume": ">",
+              "produce": "out_r"
+            }
+          ]
+        },
+        "c": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "a",
+              "consume": "<",
+              "produce": "out_a"
+            },
+            {
+              "to": "f",
+              "consume": ">",
+              "produce": "in"
+            }
+          ]
+        },
+        "d": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "e",
+              "consume": "<",
+              "produce": "maybe_b"
+            },
+            {
+              "to": "d",
+              "consume": ">",
+              "produce": "out"
+            }
+          ]
+        },
+        "e": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "a",
+              "consume": "<",
+              "produce": "out_r"
+            },
+            {
+              "to": "f",
+              "consume": ">",
+              "produce": "found"
+            }
+          ]
+        },
+        "f": {
+          "acceptingState": true,
+          "transitions": [
+            {
+              "to": "c",
+              "consume": "<",
+              "produce": "in"
+            },
+            {
+              "to": "d",
+              "consume": ">",
+              "produce": "out_a"
+            }
+          ]
+        }
+      }
+    }
+  }
+}
