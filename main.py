@@ -1,8 +1,11 @@
 from math import inf
 
+from Footprint import footprint
+from GeneratedFunctions import pos_max_max_peak
 from Testing import testing
 from TimeSeriesParser import *
 from GenerateFunctions import *
+from Enums.Semantics import Semantics
 
 
 test_sequence = [4, 4, 2, 2, 3, 5, 5, 6, 3, 1, 1, 2, 2, 2, 2, 2, 2, 1]
@@ -12,16 +15,23 @@ test_signature = time_series_to_signature_parser(test_sequence)
 print(test_signature)
 
 test_semantics = signature_to_semantic(test_signature, Patterns.PEAK)
-print(format_semantics_result(test_semantics))
+print(test_semantics)
 
 generate_functions()
 
-testing()
+pos_max_max_peak(test_sequence)
 
-test_semantics2 = [Semantics.OUT, Semantics.OUT, Semantics.MAYBE_BEFORE, Semantics.MAYBE_BEFORE, Semantics.FOUND]
-test_semantics3 = [Semantics.OUT, Semantics.OUT, Semantics.MAYBE_BEFORE, Semantics.MAYBE_BEFORE, Semantics.FOUND_END]
-test_semantics4 = [Semantics.OUT, Semantics.OUT, Semantics.MAYBE_BEFORE, Semantics.MAYBE_BEFORE, Semantics.OUT]
-test_semantics5 = [Semantics.OUT, Semantics.OUT, Semantics.MAYBE_BEFORE, Semantics.MAYBE_BEFORE, Semantics.FOUND, Semantics.MAYBE_AFTER, Semantics.MAYBE_AFTER, Semantics.IN, Semantics.OUT_RESET, Semantics.OUT ]
-test_semantics6 = [Semantics.OUT, Semantics.OUT, Semantics.OUT, Semantics.OUT, Semantics.MAYBE_BEFORE, Semantics.FOUND, Semantics.MAYBE_AFTER, Semantics.OUT_AFTER, Semantics.MAYBE_BEFORE, Semantics.MAYBE_BEFORE, Semantics.FOUND, Semantics.OUT_AFTER, Semantics.MAYBE_BEFORE, Semantics.MAYBE_BEFORE, Semantics.FOUND]
+# testing()
 
-print(find_pattern_occurrences_semantics(test_semantics6))
+"""test_footprint = footprint(test_semantics)
+print(test_footprint)"""
+
+# [0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 2, 2, 2, 2, 2, 2]
+# [4, 4, 2, 2, 3, 5, 5, 6, 3, 1, 1, 2, 2, 2, 2, 2, 2, 1]
+# [[3, 5, 5, 6, 3], [2, 2, 2, 2, 2, 2]]
+# Feature max/min de chaque tableau/pattern
+# [3, 5, 5, 6, 3]
+# Aggregateur max/min de
+
+"""for semantic in Semantics:
+    write_guard_lines(semantic, "0", "min", "max")"""

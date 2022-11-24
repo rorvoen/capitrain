@@ -2,6 +2,7 @@ import json
 
 from Enums.Patterns import Patterns
 from Enums.Semantics import Semantics
+from Enums.Aggregators import Aggregators
 
 
 def generate_functions():
@@ -39,6 +40,9 @@ def generate_functions():
                 # Declaring accumulators
                 f.write("    R = default_g_f\n    C = default_g_f\n    D = neutral_f\n\n")
 
+                # Declaring guard tables
+                f.write("    at = [0]*len(time_series)\n    ct = [0]*len(time_series)\n    f = [0]*len(time_series)\n\n")
+
                 # Declaring the i counter for getting current value in the series
                 f.write("    i = 0\n\n")
 
@@ -51,6 +55,7 @@ def generate_functions():
                 else:
                     f.write("        delta_f = " + features[feature]["delta_f"] + "\n")
 
+                # Writing the different cases for each semantic word
                 f.write("        match word:\n")
                 for word in Semantics:
                     after_value = patterns[pattern.value]["after"].__str__()
@@ -59,7 +64,8 @@ def generate_functions():
                         f.write("            case Semantics." + word.name + ":\n")
                     operations = decoration["after"+after_value][word.value]
                     for operation in operations:
-                        f.write("                " + prepare_operation_line(operation, g, phi_f) + "\n")
+                        f.write("                " + prepare_operation_line(operation, g, phi_f) + "\n\n")
+                    f.write(write_guard_lines(word, after_value, g, phi_f, 4) + "\n")
 
                 f.write("        i += 1 \n")
 
@@ -98,3 +104,27 @@ def prepare_operation_line(operation, g, phi_f, sub_op = False):
         line = line + operator + "(" + value1 + ", " + value2 + ")"
 
     return line
+
+
+def write_guard_lines(semantic, after_value, g, phi_f, nb_tab):
+    lines = ""
+    tab = nb_tab * "    "
+    tables = json.load(open('DecorationTables.json'))["tables"]
+    guard_table = tables["decoration"]["guard"]["after"+after_value]
+    for case in guard_table[semantic.value]:
+        condition = "condition" in case
+        if condition:
+            condition = "if " + case["condition"] + ":"
+            if g == "max":
+                condition = condition.replace("<g", ">")
+            elif g == "min":
+                condition = condition.replace("<g", "<")
+            condition = condition.replace("phi_f",phi_f)
+            lines = lines + tab + condition + "\n"
+        for operation in case["operations"]:
+            if condition:
+                lines = lines + "    "
+            lines = lines + tab + prepare_operation_line(operation, g, phi_f) + "\n"
+    return lines
+
+

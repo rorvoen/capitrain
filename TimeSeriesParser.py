@@ -88,15 +88,3 @@ def find_pattern_occurrences_semantics(semantics):
         print(res)
         i += 1
     return res
-
-
-def format_semantics_result(semantics):
-    res = "["
-    i = 0
-    while i < len(semantics):
-        if i == len(semantics) - 1:
-            res = res + semantics[i].name + "] "
-        else:
-            res = res + semantics[i].name + ", "
-        i += 1
-    return res

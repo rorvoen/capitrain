@@ -82,6 +82,212 @@
           {"acc": "D","operator": "affect","value1": "neutral_f"}
         ],
         "out":[]
+      },
+      "guard": {
+        "after0": {
+          "out": [
+          {
+            "operations" : [
+              {"acc": "f[i]", "operator": "affect", "value1": "0"},
+              {"acc": "ct[i+1]", "operator": "affect", "value1": "ct[i]"},
+              {"acc": "at[i+1]", "operator": "affect", "value1": "at[i]"}
+            ]
+          }
+        ],
+          "out_r": [
+            {
+              "operations" : [
+                {"acc": "f[i]", "operator": "affect", "value1": "0"},
+                {"acc": "ct[i+1]", "operator": "affect", "value1": "ct[i]"},
+                {"acc": "at[i+1]", "operator": "affect", "value1": "at[i]"}
+              ]
+            }
+          ],
+          "out_a": [
+            { "condition": "C <g R",
+              "operations" : [
+                {"acc": "f[i]", "operator": "affect", "value1": "0"},
+                {"acc": "at[i]", "operator": "affect", "value1": "0"},
+                {"acc": "at[i+1]", "operator": "affect", "value1": "ct[i]"}
+              ]
+            },
+            { "condition": "C == R",
+              "operations" : [
+                {"acc": "f[i]", "operator": "affect", "value1": "0"},
+                {"acc": "at[i+1]", "operator": "affect", "value1": "ct[i]"},
+                {"acc": "at[i+1]", "operator": "affect", "value1": "at[i]"}
+              ]
+            },
+            { "condition": "R <g C",
+              "operations" : [
+                {"acc": "f[i]", "operator": "affect", "value1": "0"},
+                {"acc": "ct[i]", "operator": "affect", "value1": "0"},
+                {"acc": "at[i+1]", "operator": "affect", "value1": "at[i]"}
+              ]
+            }
+          ],
+          "maybe_b": [
+            {
+              "operations" : [
+                {"acc": "f[i]", "operator": "affect", "value1": "0"},
+                {"acc": "ct[i+1]", "operator": "affect", "value1": "ct[i]"},
+                {"acc": "at[i+1]", "operator": "affect", "value1": "at[i]"}
+              ]
+            }
+          ],
+          "maybe_a": [
+            {
+              "operations" : [
+                {"acc": "f[i]", "operator": "affect", "value1": "0"},
+                {"acc": "ct[i+1]", "operator": "affect", "value1": "ct[i]"},
+                {"acc": "at[i+1]", "operator": "affect", "value1": "at[i]"}
+              ]
+            }
+          ],
+          "found": [
+            {
+              "operations" : [
+                {"acc": "ct[i]", "operator": "affect", "value1": "0"},
+                {"acc": "ct[i+1]", "operator": "affect", "value1": "f[i]"},
+                {"acc": "at[i+1]", "operator": "affect", "value1": "at[i]"}
+              ]
+            }
+          ],
+          "in": [
+            {
+              "operations" : [
+                {"acc": "f[i]", "operator": "affect", "value1": "0"},
+                {"acc": "ct[i+1]", "operator": "affect", "value1": "ct[i]"},
+                {"acc": "at[i+1]", "operator": "affect", "value1": "at[i]"}
+              ]
+            }
+          ],
+          "found_e": [
+            { "condition": "phi_f(phi_f(D,delta_f),delta_f_1) <g R",
+              "operations" : [
+                {"acc": "ct[i]", "operator": "affect", "value1": "f[i]"},
+                {"acc": "at[i]", "operator": "affect", "value1": "0"},
+                {"acc": "at[i+1]", "operator": "affect", "value1": "ct[i]"}
+              ]
+            },
+            { "condition": "phi_f(phi_f(D,delta_f),delta_f_1) == R",
+              "operations" : [
+                {"acc": "at[i+1]", "operator": "affect", "value1": "f[i]"},
+                {"acc": "at[i+1]", "operator": "affect", "value1": "ct[i]"},
+                {"acc": "at[i+1]", "operator": "affect", "value1": "at[i]"}
+              ]
+            },
+            { "condition": "R <g phi_f(phi_f(D,delta_f),delta_f_1)",
+              "operations" : [
+                {"acc": "f[i]", "operator": "affect", "value1": "0"},
+                {"acc": "ct[i]", "operator": "affect", "value1": "0"},
+                {"acc": "at[i+1]", "operator": "affect", "value1": "at[i]"}
+              ]
+            }
+          ]
+        },
+        "after1": {
+          "out": [
+          {
+            "operations" : [
+              {"acc": "f[i]", "operator": "affect", "value1": "0"},
+              {"acc": "ct[i+1]", "operator": "affect", "value1": "ct[i]"},
+              {"acc": "at[i+1]", "operator": "affect", "value1": "at[i]"}
+            ]
+          }
+        ],
+          "out_r": [
+            {
+              "operations" : [
+                {"acc": "f[i]", "operator": "affect", "value1": "0"},
+                {"acc": "ct[i+1]", "operator": "affect", "value1": "ct[i]"},
+                {"acc": "at[i+1]", "operator": "affect", "value1": "at[i]"}
+              ]
+            }
+          ],
+          "out_a": [
+            { "condition": "C <g R",
+              "operations" : [
+                {"acc": "f[i]", "operator": "affect", "value1": "0"},
+                {"acc": "at[i]", "operator": "affect", "value1": "0"},
+                {"acc": "at[i+1]", "operator": "affect", "value1": "ct[i]"}
+              ]
+            },
+            { "condition": "C == R",
+              "operations" : [
+                {"acc": "f[i]", "operator": "affect", "value1": "0"},
+                {"acc": "at[i+1]", "operator": "affect", "value1": "ct[i]"},
+                {"acc": "at[i+1]", "operator": "affect", "value1": "at[i]"}
+              ]
+            },
+            { "condition": "R <g C",
+              "operations" : [
+                {"acc": "f[i]", "operator": "affect", "value1": "0"},
+                {"acc": "ct[i]", "operator": "affect", "value1": "0"},
+                {"acc": "at[i+1]", "operator": "affect", "value1": "at[i]"}
+              ]
+            }
+          ],
+          "maybe_b": [
+            {
+              "operations" : [
+                {"acc": "f[i]", "operator": "affect", "value1": "0"},
+                {"acc": "ct[i+1]", "operator": "affect", "value1": "ct[i]"},
+                {"acc": "at[i+1]", "operator": "affect", "value1": "at[i]"}
+              ]
+            }
+          ],
+          "maybe_a": [
+            {
+              "operations" : [
+                {"acc": "f[i]", "operator": "affect", "value1": "0"},
+                {"acc": "ct[i+1]", "operator": "affect", "value1": "ct[i]"},
+                {"acc": "at[i+1]", "operator": "affect", "value1": "at[i]"}
+              ]
+            }
+          ],
+          "found": [
+            {
+              "operations" : [
+                {"acc": "ct[i]", "operator": "affect", "value1": "0"},
+                {"acc": "ct[i+1]", "operator": "affect", "value1": "f[i]"},
+                {"acc": "at[i+1]", "operator": "affect", "value1": "at[i]"}
+              ]
+            }
+          ],
+          "in": [
+            {
+              "operations" : [
+                {"acc": "f[i]", "operator": "affect", "value1": "0"},
+                {"acc": "ct[i+1]", "operator": "affect", "value1": "ct[i]"},
+                {"acc": "at[i+1]", "operator": "affect", "value1": "at[i]"}
+              ]
+            }
+          ],
+          "found_e": [
+            { "condition": "phi_f(D,delta_f) <g R",
+              "operations" : [
+                {"acc": "ct[i]", "operator": "affect", "value1": "f[i]"},
+                {"acc": "at[i]", "operator": "affect", "value1": "0"},
+                {"acc": "at[i+1]", "operator": "affect", "value1": "ct[i]"}
+              ]
+            },
+            { "condition": "phi_f(D,delta_f) == R",
+              "operations" : [
+                {"acc": "at[i+1]", "operator": "affect", "value1": "f[i]"},
+                {"acc": "at[i+1]", "operator": "affect", "value1": "ct[i]"},
+                {"acc": "at[i+1]", "operator": "affect", "value1": "at[i]"}
+              ]
+            },
+            { "condition": "R <g phi_f(D,delta_f)",
+              "operations" : [
+                {"acc": "f[i]", "operator": "affect", "value1": "0"},
+                {"acc": "ct[i]", "operator": "affect", "value1": "0"},
+                {"acc": "at[i+1]", "operator": "affect", "value1": "at[i]"}
+              ]
+            }
+          ]
+        }
       }
     }
   }
