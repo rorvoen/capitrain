@@ -136,7 +136,7 @@ def prepare_operation_line(operation, g, phi_f, sub_op=False):
     return line
 
 
-# Preparation of the guard operations lines using the decoration table JSON
+# Preparation of the guard operations lines using the decoration table JSON for a defined semantic word
 def prepare_guard_lines(semantic, after_value, g, phi_f, nb_tab):
     lines = ""
     # Defining a variable to indent the code block according to the level it will be writen in the final file
@@ -144,24 +144,30 @@ def prepare_guard_lines(semantic, after_value, g, phi_f, nb_tab):
     # Getting the appropriate part of the decoration table
     tables = json.load(open('Json/DecorationTables.json'))["tables"]
     guard_table = tables["decoration"]["guard"]["after" + after_value]
+    # Iteration on the different cases for the semantic word
     for case in guard_table[semantic.value]:
+        # Checking if there is a condition for this case to execute operation(s)
         condition = "condition" in case
         if condition:
             condition = "if " + case["condition"] + ":"
             if g == "max":
-                condition = condition.replace("<g", ">")
+                condition = condition.replace("<g", ">")  # Replacing <g by the > operator
             elif g == "min":
-                condition = condition.replace("<g", "<")
-            condition = condition.replace("phi_f", phi_f)
+                condition = condition.replace("<g", "<")  # Replacing <g by the < operator
+            condition = condition.replace("phi_f", phi_f)  # Replacing phi_f by the appropriate function
             lines = lines + tab + condition + "\n"
+        # Iterating on operations lines
         for operation in case["operations"]:
+            # Indenting if there is a condition to the operation
             if condition:
                 lines = lines + "    "
-            var = operation["var"]
-            value = operation["value"]
+            var = operation["var"]  # Getting the variable to change
+            value = operation["value"]  # Value to affect to the variable
+            # If the value is an int we use the value form of GuardValue, if not we use the pointer form
             if isinstance(value, int):
                 lines = lines + tab + var + " = GuardValue(" + value.__str__() + ")" + "\n"
             else:
+                # Getting separately the name of the table to affect and the index
                 match = re.search(r"(at|ct|f)\[(i\+1|i)\]", value)
                 if not (match is None):
                     lines = lines + tab + var + " = GuardValue(float(inf), " + match.group(1) + ", " + match.group(2) + ", \"" + match.group(1) + "\")" + "\n"
