@@ -1,4 +1,5 @@
 import json
+import re
 
 from Enums.Patterns import Patterns
 from Enums.Semantics import Semantics
@@ -9,6 +10,7 @@ def generate_functions():
     f = open("GeneratedFunctions.py", "w")
     f.write("from math import inf\n")
     f.write("from Enums.Patterns import Patterns\n")
+    f.write("from GuardValue import GuardValue\n")
     f.write("from TimeSeriesParser import *\n\n\n")
     f.close()
 
@@ -32,7 +34,8 @@ def generate_functions():
                 f.write("    semantics = signature_to_semantic(signature, Patterns." + pattern.name + ")\n")
 
                 # Declaring the default_g_f constant
-                f.write("    default_g_f = " + float(features[feature][aggregators[aggregator]["default_g_f"]]).__str__() + "\n")
+                f.write("    default_g_f = " + float(
+                    features[feature][aggregators[aggregator]["default_g_f"]]).__str__() + "\n")
                 # Declaring the neutral_f constant
                 f.write("    neutral_f = " + float(features[feature]["neutral_f"]).__str__() + "\n")
                 f.write("\n")
@@ -41,7 +44,8 @@ def generate_functions():
                 f.write("    R = default_g_f\n    C = default_g_f\n    D = neutral_f\n\n")
 
                 # Declaring guard tables
-                f.write("    at = [0]*len(time_series)\n    ct = [0]*len(time_series)\n    f = [0]*len(time_series)\n\n")
+                f.write(
+                    "    at = [GuardValue(0)]*len(time_series)\n    ct = [GuardValue(0)]*len(time_series)\n    f = [GuardValue(0)]*len(time_series)\n\n")
 
                 # Declaring the i counter for getting current value in the series
                 f.write("    i = 0\n\n")
@@ -59,23 +63,44 @@ def generate_functions():
                 f.write("        match word:\n")
                 for word in Semantics:
                     after_value = patterns[pattern.value]["after"].__str__()
-                    if bool(decoration["after"+after_value][word.value]):  # Checking if there is operations for word
-                        # (possibility to remove case if no corresponding word in the semantics)
-                        f.write("            case Semantics." + word.name + ":\n")
-                    operations = decoration["after"+after_value][word.value]
+                    f.write("            case Semantics." + word.name + ":\n")
+                    f.write(write_guard_lines(word, after_value, g, phi_f, 4) + "\n")
+                    operations = decoration["after" + after_value][word.value]
                     for operation in operations:
                         f.write("                " + prepare_operation_line(operation, g, phi_f) + "\n\n")
-                    f.write(write_guard_lines(word, after_value, g, phi_f, 4) + "\n")
 
-                f.write("        i += 1 \n")
+                f.write("        i += 1 \n\n")
 
-                f.write("\n    return " + g + "(R, C)\n")
+                # Guard end conditions
+                f.write("    f[len(time_series) - 1] = GuardValue(0)\n")
+                f.write("    if C > R:\n")
+                f.write("        ct[len(time_series) - 1] = GuardValue(1)\n")
+                f.write("        at[len(time_series) - 1] = GuardValue(0)\n")
+                f.write("    if (C == R) | (R == default_g_f):\n")
+                f.write("        ct[len(time_series) - 1] = GuardValue(0)\n")
+                f.write("        at[len(time_series) - 1] = GuardValue(0)\n")
+                f.write("    if (C == R) | (R != default_g_f):\n")
+                f.write("        ct[len(time_series) - 1] = GuardValue(1)\n")
+                f.write("        at[len(time_series) - 1] = GuardValue(1)\n")
+                f.write("    if R > C:\n")
+                f.write("        ct[len(time_series) - 1] = GuardValue(0)\n")
+                f.write("        at[len(time_series) - 1] = GuardValue(1)\n\n")
+
+                """# Pointers update in f, at, ct tables
+                f.write("    i = len(semantics)-1\n")
+                f.write("    while i >= 0:\n")
+                f.write("        at[i].update(f, at, ct)\n")
+                f.write("        ct[i].update(f, at, ct)\n")
+                f.write("        f[i].update(f, at, ct)\n")
+                f.write("        i -= 1\n")"""
+
+                f.write("\n    return " + g + "(R,C), time_series, f\n")
                 f.write("\n\n")
 
     f.close()
 
 
-def prepare_operation_line(operation, g, phi_f, sub_op = False):
+def prepare_operation_line(operation, g, phi_f, sub_op=False):
     line = ""
     # Beginning of the code line generated (if not a sub operation
     if not sub_op:
@@ -87,10 +112,17 @@ def prepare_operation_line(operation, g, phi_f, sub_op = False):
         if not (isinstance(operation["value2"], str)):
             value2 = "(" + prepare_operation_line(operation["value2"], g, phi_f, True) + ")"
         else:
-            value2 = "float(" + operation["value2"] + ")"
+            if (value2 == "inf") | (value2 == "-inf"):
+                value2 = "float(" + operation["value2"] + ")"
+            else:
+                value2 = operation["value2"]
 
     # Getting the first value and the operator
-    value1 = "float(" + operation["value1"] + ")"
+    value1 = ""
+    if (value1 == "inf") | (value1 == "-inf"):
+        value1 = "float(" + operation["value1"] + ")"
+    else:
+        value1 = operation["value1"]
     operator = operation["operator"]
 
     # Finishing line writing
@@ -110,7 +142,7 @@ def write_guard_lines(semantic, after_value, g, phi_f, nb_tab):
     lines = ""
     tab = nb_tab * "    "
     tables = json.load(open('DecorationTables.json'))["tables"]
-    guard_table = tables["decoration"]["guard"]["after"+after_value]
+    guard_table = tables["decoration"]["guard"]["after" + after_value]
     for case in guard_table[semantic.value]:
         condition = "condition" in case
         if condition:
@@ -119,12 +151,17 @@ def write_guard_lines(semantic, after_value, g, phi_f, nb_tab):
                 condition = condition.replace("<g", ">")
             elif g == "min":
                 condition = condition.replace("<g", "<")
-            condition = condition.replace("phi_f",phi_f)
+            condition = condition.replace("phi_f", phi_f)
             lines = lines + tab + condition + "\n"
         for operation in case["operations"]:
             if condition:
                 lines = lines + "    "
-            lines = lines + tab + prepare_operation_line(operation, g, phi_f) + "\n"
+            var = operation["var"]
+            value = operation["value"]
+            if isinstance(value, int):
+                lines = lines + tab + var + " = GuardValue(" + value.__str__() + ")" + "\n"
+            else:
+                match = re.search(r"(at|ct|f)\[(i\+1|i)\]", value)
+                if not (match is None):
+                    lines = lines + tab + var + " = GuardValue(float(inf), " + match.group(1) + ", " + match.group(2) + ")" + "\n"
     return lines
-
-

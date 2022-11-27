@@ -4,13 +4,15 @@ import GeneratedFunctions
 
 
 def testing():
-    tests = json.load(open('JeuTest.json'))["tests"]
+    testing = json.load(open('JeuTest.json'))["testing"]
     total_ok = 0
     total_ko = 0
-    for test in tests:
-        function = getattr(GeneratedFunctions, "pos_"+test)
-        res = function(tests[test]["data"])
-        if res == tests[test]["result"]:
+    for test in testing:
+        function = getattr(GeneratedFunctions, test)
+        res = function(testing[test]["time_series"])
+        print(res)
+        print((testing[test]["result"], testing[test]["time_series"], testing[test]["found"]))
+        if res == (testing[test]["result"], testing[test]["time_series"], testing[test]["found"]):
             total_ok += 1
         else:
             total_ko += 1
@@ -19,5 +21,5 @@ def testing():
             print("-------------------------")
 
     print("==============================")
-    print(total_ok.__str__() + " out of " + len(tests).__str__() + " tests (" + total_ko.__str__() + " KO)")
+    print(total_ok.__str__() + " out of " + len(testing).__str__() + " tests (" + total_ko.__str__() + " KO)")
     print("==============================")

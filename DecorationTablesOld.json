@@ -222,7 +222,7 @@
               "operations": [
                 {
                   "var": "f[i]",
-                  "value": 0
+                  "value": "0"
                 },
                 {
                   "var": "ct[i+1]",
@@ -240,7 +240,7 @@
               "operations": [
                 {
                   "var": "f[i]",
-                  "value": 0
+                  "value": "0"
                 },
                 {
                   "var": "ct[i+1]",
@@ -259,11 +259,11 @@
               "operations": [
                 {
                   "var": "f[i]",
-                  "value": 0
+                  "value": "0"
                 },
                 {
                   "var": "at[i]",
-                  "value": 0
+                  "value": "0"
                 },
                 {
                   "var": "at[i+1]",
@@ -276,7 +276,7 @@
               "operations": [
                 {
                   "var": "f[i]",
-                  "value": 0
+                  "value": "0"
                 },
                 {
                   "var": "at[i+1]",
@@ -293,11 +293,11 @@
               "operations": [
                 {
                   "var": "f[i]",
-                  "value": 0
+                  "value": "0"
                 },
                 {
                   "var": "ct[i]",
-                  "value": 0
+                  "value": "0"
                 },
                 {
                   "var": "at[i+1]",
@@ -311,7 +311,7 @@
               "operations": [
                 {
                   "var": "f[i]",
-                  "value": 0
+                  "value": "0"
                 },
                 {
                   "var": "ct[i+1]",
@@ -329,7 +329,7 @@
               "operations": [
                 {
                   "var": "f[i]",
-                  "value": 0
+                  "value": "0"
                 },
                 {
                   "var": "ct[i+1]",
@@ -347,7 +347,7 @@
               "operations": [
                 {
                   "var": "ct[i]",
-                  "value": 0
+                  "value": "0"
                 },
                 {
                   "var": "ct[i+1]",
@@ -365,7 +365,7 @@
               "operations": [
                 {
                   "var": "f[i]",
-                  "value": 0
+                  "value": "0"
                 },
                 {
                   "var": "ct[i+1]",
@@ -388,7 +388,7 @@
                 },
                 {
                   "var": "at[i]",
-                  "value": 0
+                  "value": "0"
                 },
                 {
                   "var": "at[i+1]",
@@ -418,11 +418,11 @@
               "operations": [
                 {
                   "var": "f[i]",
-                  "value": 0
+                  "value": "0"
                 },
                 {
                   "var": "ct[i]",
-                  "value": 0
+                  "value": "0"
                 },
                 {
                   "var": "at[i+1]",
@@ -438,15 +438,15 @@
               "operations": [
                 {
                   "var": "f[i]",
-                  "value": 0
+                  "value": "0"
                 },
                 {
-                  "var": "ct[i]",
-                  "value": "ct[i+1]"
+                  "var": "ct[i+1]",
+                  "value": "ct[i]"
                 },
                 {
-                  "var": "at[i]",
-                  "value": "at[i+1]"
+                  "var": "at[i+1]",
+                  "value": "at[i]"
                 }
               ]
             }
@@ -456,15 +456,15 @@
               "operations": [
                 {
                   "var": "f[i]",
-                  "value": 0
+                  "value": "0"
                 },
                 {
-                  "var": "ct[i]",
-                  "value": "ct[i+1]"
+                  "var": "ct[i+1]",
+                  "value": "ct[i]"
                 },
                 {
-                  "var": "at[i]",
-                  "value": "at[i+1]"
+                  "var": "at[i+1]",
+                  "value": "at[i]"
                 }
               ]
             }
@@ -475,15 +475,15 @@
               "operations": [
                 {
                   "var": "f[i]",
-                  "value": 0
+                  "value": "0"
                 },
                 {
                   "var": "at[i]",
-                  "value": 0
+                  "value": "0"
                 },
                 {
-                  "var": "ct[i]",
-                  "value": "at[i+1]"
+                  "var": "at[i+1]",
+                  "value": "ct[i]"
                 }
               ]
             },
@@ -492,15 +492,15 @@
               "operations": [
                 {
                   "var": "f[i]",
-                  "value": 0
+                  "value": "0"
                 },
                 {
-                  "var": "ct[i]",
-                  "value": "at[i+1]"
+                  "var": "at[i+1]",
+                  "value": "ct[i]"
                 },
                 {
-                  "var": "at[i]",
-                  "value": "at[i+1]"
+                  "var": "at[i+1]",
+                  "value": "at[i]"
                 }
               ]
             },
@@ -509,15 +509,15 @@
               "operations": [
                 {
                   "var": "f[i]",
-                  "value": 0
+                  "value": "0"
                 },
                 {
                   "var": "ct[i]",
-                  "value": 0
+                  "value": "0"
                 },
                 {
-                  "var": "at[i]",
-                  "value": "at[i+1]"
+                  "var": "at[i+1]",
+                  "value": "at[i]"
                 }
               ]
             }
@@ -527,15 +527,15 @@
               "operations": [
                 {
                   "var": "f[i]",
-                  "value": 0
+                  "value": "0"
                 },
                 {
-                  "var": "ct[i]",
-                  "value": "ct[i+1]"
+                  "var": "ct[i+1]",
+                  "value": "ct[i]"
                 },
                 {
-                  "var": "at[i]",
-                  "value": "at[i+1]"
+                  "var": "at[i+1]",
+                  "value": "at[i]"
                 }
               ]
             }
@@ -545,15 +545,15 @@
               "operations": [
                 {
                   "var": "f[i]",
-                  "value": 0
+                  "value": "0"
                 },
                 {
-                  "var": "ct[i]",
-                  "value": "ct[i+1]"
+                  "var": "ct[i+1]",
+                  "value": "ct[i]"
                 },
                 {
-                  "var": "at[i]",
-                  "value": "at[i+1]"
+                  "var": "at[i+1]",
+                  "value": "at[i]"
                 }
               ]
             }
@@ -563,15 +563,15 @@
               "operations": [
                 {
                   "var": "ct[i]",
-                  "value": 0
+                  "value": "0"
                 },
                 {
-                  "var": "f[i]",
-                  "value": "ct[i+1]"
+                  "var": "ct[i+1]",
+                  "value": "f[i]"
                 },
                 {
-                  "var": "at[i]",
-                  "value": "at[i+1]"
+                  "var": "at[i+1]",
+                  "value": "at[i]"
                 }
               ]
             }
@@ -581,15 +581,15 @@
               "operations": [
                 {
                   "var": "f[i]",
-                  "value": 0
+                  "value": "0"
                 },
                 {
-                  "var": "ct[i]",
-                  "value": "ct[i+1]"
+                  "var": "ct[i+1]",
+                  "value": "ct[i]"
                 },
                 {
-                  "var": "at[i]",
-                  "value": "at[i+1]"
+                  "var": "at[i+1]",
+                  "value": "at[i]"
                 }
               ]
             }
@@ -599,16 +599,16 @@
               "condition": "phi_f(D,delta_f) <g R",
               "operations": [
                 {
-                  "var": "f[i]",
-                  "value": "ct[i]"
+                  "var": "ct[i]",
+                  "value": "f[i]"
                 },
                 {
                   "var": "at[i]",
-                  "value": 0
+                  "value": "0"
                 },
                 {
-                  "var": "ct[i]",
-                  "value": "at[i+1]"
+                  "var": "at[i+1]",
+                  "value": "ct[i]"
                 }
               ]
             },
@@ -616,16 +616,16 @@
               "condition": "phi_f(D,delta_f) == R",
               "operations": [
                 {
-                  "var": "f[i]",
-                  "value": "at[i+1]"
+                  "var": "at[i+1]",
+                  "value": "f[i]"
                 },
                 {
-                  "var": "ct[i]",
-                  "value": "at[i+1]"
+                  "var": "at[i+1]",
+                  "value": "ct[i]"
                 },
                 {
-                  "var": "at[i]",
-                  "value": "at[i+1]"
+                  "var": "at[i+1]",
+                  "value": "at[i]"
                 }
               ]
             },
@@ -634,15 +634,15 @@
               "operations": [
                 {
                   "var": "f[i]",
-                  "value": 0
+                  "value": "0"
                 },
                 {
                   "var": "ct[i]",
-                  "value": 0
+                  "value": "0"
                 },
                 {
-                  "var": "at[i]",
-                  "value": "at[i+1]"
+                  "var": "at[i+1]",
+                  "value": "at[i]"
                 }
               ]
             }

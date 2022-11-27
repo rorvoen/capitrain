@@ -1,5 +1,6 @@
 from math import inf
 from Enums.Patterns import Patterns
+from GuardValue import GuardValue
 from TimeSeriesParser import *
 
 
@@ -13,9 +14,9 @@ def pos_max_max_bump_on_decreasing_sequence(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -24,89 +25,105 @@ def pos_max_max_bump_on_decreasing_sequence(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (max(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if max(D,delta_f) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if max(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > max(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = max(R, (max(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_max_decreasing(time_series):
@@ -119,9 +136,9 @@ def pos_max_max_decreasing(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -130,89 +147,105 @@ def pos_max_max_decreasing(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(delta_f_1, (max(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if max(max(D,delta_f),delta_f_1) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if max(max(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > max(max(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = max(R, (max(delta_f_1, (max(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_max_decreasing_sequence(time_series):
@@ -225,9 +258,9 @@ def pos_max_max_decreasing_sequence(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -236,89 +269,105 @@ def pos_max_max_decreasing_sequence(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(delta_f_1, (max(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if max(max(D,delta_f),delta_f_1) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if max(max(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > max(max(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = max(R, (max(delta_f_1, (max(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_max_decreasing_terrace(time_series):
@@ -331,9 +380,9 @@ def pos_max_max_decreasing_terrace(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -342,89 +391,105 @@ def pos_max_max_decreasing_terrace(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(delta_f_1, (max(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if max(max(D,delta_f),delta_f_1) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if max(max(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > max(max(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = max(R, (max(delta_f_1, (max(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_max_dip_on_increasing_sequence(time_series):
@@ -437,9 +502,9 @@ def pos_max_max_dip_on_increasing_sequence(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -448,89 +513,105 @@ def pos_max_max_dip_on_increasing_sequence(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (max(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if max(D,delta_f) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if max(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > max(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = max(R, (max(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_max_gorge(time_series):
@@ -543,9 +624,9 @@ def pos_max_max_gorge(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -554,89 +635,105 @@ def pos_max_max_gorge(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (max(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if max(D,delta_f) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if max(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > max(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = max(R, (max(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_max_increasing(time_series):
@@ -649,9 +746,9 @@ def pos_max_max_increasing(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -660,89 +757,105 @@ def pos_max_max_increasing(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(delta_f_1, (max(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if max(max(D,delta_f),delta_f_1) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if max(max(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > max(max(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = max(R, (max(delta_f_1, (max(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_max_increasing_sequence(time_series):
@@ -755,9 +868,9 @@ def pos_max_max_increasing_sequence(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -766,89 +879,105 @@ def pos_max_max_increasing_sequence(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(delta_f_1, (max(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if max(max(D,delta_f),delta_f_1) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if max(max(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > max(max(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = max(R, (max(delta_f_1, (max(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_max_increasing_terrace(time_series):
@@ -861,9 +990,9 @@ def pos_max_max_increasing_terrace(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -872,89 +1001,105 @@ def pos_max_max_increasing_terrace(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (max(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if max(D,delta_f) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if max(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > max(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = max(R, (max(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_max_inflexion(time_series):
@@ -967,9 +1112,9 @@ def pos_max_max_inflexion(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -978,89 +1123,105 @@ def pos_max_max_inflexion(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (max(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if max(D,delta_f) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if max(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > max(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = max(R, (max(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_max_peak(time_series):
@@ -1073,9 +1234,9 @@ def pos_max_max_peak(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -1084,89 +1245,105 @@ def pos_max_max_peak(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (max(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if max(D,delta_f) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if max(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > max(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = max(R, (max(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_max_plain(time_series):
@@ -1179,9 +1356,9 @@ def pos_max_max_plain(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -1190,89 +1367,105 @@ def pos_max_max_plain(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (max(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if max(D,delta_f) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if max(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > max(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = max(R, (max(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_max_plateau(time_series):
@@ -1285,9 +1478,9 @@ def pos_max_max_plateau(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -1296,89 +1489,105 @@ def pos_max_max_plateau(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (max(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if max(D,delta_f) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if max(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > max(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = max(R, (max(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_max_proper_plain(time_series):
@@ -1391,9 +1600,9 @@ def pos_max_max_proper_plain(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -1402,89 +1611,105 @@ def pos_max_max_proper_plain(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (max(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if max(D,delta_f) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if max(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > max(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = max(R, (max(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_max_proper_plateau(time_series):
@@ -1497,9 +1722,9 @@ def pos_max_max_proper_plateau(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -1508,89 +1733,105 @@ def pos_max_max_proper_plateau(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (max(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if max(D,delta_f) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if max(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > max(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = max(R, (max(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_max_steady(time_series):
@@ -1603,9 +1844,9 @@ def pos_max_max_steady(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -1614,89 +1855,105 @@ def pos_max_max_steady(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(delta_f_1, (max(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if max(max(D,delta_f),delta_f_1) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if max(max(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > max(max(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = max(R, (max(delta_f_1, (max(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_max_steady_sequence(time_series):
@@ -1709,9 +1966,9 @@ def pos_max_max_steady_sequence(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -1720,89 +1977,105 @@ def pos_max_max_steady_sequence(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(delta_f_1, (max(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if max(max(D,delta_f),delta_f_1) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if max(max(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > max(max(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = max(R, (max(delta_f_1, (max(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_max_strictly_decreasing_sequence(time_series):
@@ -1815,9 +2088,9 @@ def pos_max_max_strictly_decreasing_sequence(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -1826,89 +2099,105 @@ def pos_max_max_strictly_decreasing_sequence(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(delta_f_1, (max(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if max(max(D,delta_f),delta_f_1) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if max(max(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > max(max(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = max(R, (max(delta_f_1, (max(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_max_strictly_increasing_sequence(time_series):
@@ -1921,9 +2210,9 @@ def pos_max_max_strictly_increasing_sequence(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -1932,89 +2221,105 @@ def pos_max_max_strictly_increasing_sequence(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(delta_f_1, (max(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if max(max(D,delta_f),delta_f_1) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if max(max(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > max(max(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = max(R, (max(delta_f_1, (max(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_max_summit(time_series):
@@ -2027,9 +2332,9 @@ def pos_max_max_summit(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -2038,89 +2343,105 @@ def pos_max_max_summit(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (max(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if max(D,delta_f) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if max(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > max(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = max(R, (max(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_max_valley(time_series):
@@ -2133,9 +2454,9 @@ def pos_max_max_valley(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -2144,89 +2465,105 @@ def pos_max_max_valley(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (max(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if max(D,delta_f) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if max(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > max(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = max(R, (max(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_max_zigzag(time_series):
@@ -2239,9 +2576,9 @@ def pos_max_max_zigzag(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -2250,89 +2587,105 @@ def pos_max_max_zigzag(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (max(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if max(D,delta_f) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if max(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > max(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = max(R, (max(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_min_bump_on_decreasing_sequence(time_series):
@@ -2345,9 +2698,9 @@ def pos_max_min_bump_on_decreasing_sequence(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -2356,89 +2709,105 @@ def pos_max_min_bump_on_decreasing_sequence(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (min(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if min(D,delta_f) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if min(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > min(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = max(R, (min(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_min_decreasing(time_series):
@@ -2451,9 +2820,9 @@ def pos_max_min_decreasing(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -2462,89 +2831,105 @@ def pos_max_min_decreasing(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(delta_f_1, (min(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if min(min(D,delta_f),delta_f_1) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if min(min(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > min(min(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = max(R, (min(delta_f_1, (min(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_min_decreasing_sequence(time_series):
@@ -2557,9 +2942,9 @@ def pos_max_min_decreasing_sequence(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -2568,89 +2953,105 @@ def pos_max_min_decreasing_sequence(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(delta_f_1, (min(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if min(min(D,delta_f),delta_f_1) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if min(min(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > min(min(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = max(R, (min(delta_f_1, (min(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_min_decreasing_terrace(time_series):
@@ -2663,9 +3064,9 @@ def pos_max_min_decreasing_terrace(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -2674,89 +3075,105 @@ def pos_max_min_decreasing_terrace(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(delta_f_1, (min(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if min(min(D,delta_f),delta_f_1) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if min(min(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > min(min(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = max(R, (min(delta_f_1, (min(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_min_dip_on_increasing_sequence(time_series):
@@ -2769,9 +3186,9 @@ def pos_max_min_dip_on_increasing_sequence(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -2780,89 +3197,105 @@ def pos_max_min_dip_on_increasing_sequence(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (min(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if min(D,delta_f) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if min(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > min(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = max(R, (min(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_min_gorge(time_series):
@@ -2875,9 +3308,9 @@ def pos_max_min_gorge(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -2886,89 +3319,105 @@ def pos_max_min_gorge(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (min(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if min(D,delta_f) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if min(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > min(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = max(R, (min(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_min_increasing(time_series):
@@ -2981,9 +3430,9 @@ def pos_max_min_increasing(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -2992,89 +3441,105 @@ def pos_max_min_increasing(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(delta_f_1, (min(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if min(min(D,delta_f),delta_f_1) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if min(min(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > min(min(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = max(R, (min(delta_f_1, (min(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_min_increasing_sequence(time_series):
@@ -3087,9 +3552,9 @@ def pos_max_min_increasing_sequence(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -3098,89 +3563,105 @@ def pos_max_min_increasing_sequence(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(delta_f_1, (min(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if min(min(D,delta_f),delta_f_1) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if min(min(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > min(min(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = max(R, (min(delta_f_1, (min(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_min_increasing_terrace(time_series):
@@ -3193,9 +3674,9 @@ def pos_max_min_increasing_terrace(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -3204,89 +3685,105 @@ def pos_max_min_increasing_terrace(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (min(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if min(D,delta_f) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if min(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > min(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = max(R, (min(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_min_inflexion(time_series):
@@ -3299,9 +3796,9 @@ def pos_max_min_inflexion(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -3310,89 +3807,105 @@ def pos_max_min_inflexion(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (min(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if min(D,delta_f) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if min(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > min(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = max(R, (min(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_min_peak(time_series):
@@ -3405,9 +3918,9 @@ def pos_max_min_peak(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -3416,89 +3929,105 @@ def pos_max_min_peak(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (min(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if min(D,delta_f) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if min(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > min(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = max(R, (min(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_min_plain(time_series):
@@ -3511,9 +4040,9 @@ def pos_max_min_plain(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -3522,89 +4051,105 @@ def pos_max_min_plain(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (min(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if min(D,delta_f) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if min(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > min(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = max(R, (min(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_min_plateau(time_series):
@@ -3617,9 +4162,9 @@ def pos_max_min_plateau(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -3628,89 +4173,105 @@ def pos_max_min_plateau(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (min(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if min(D,delta_f) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if min(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > min(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = max(R, (min(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_min_proper_plain(time_series):
@@ -3723,9 +4284,9 @@ def pos_max_min_proper_plain(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -3734,89 +4295,105 @@ def pos_max_min_proper_plain(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (min(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if min(D,delta_f) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if min(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > min(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = max(R, (min(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_min_proper_plateau(time_series):
@@ -3829,9 +4406,9 @@ def pos_max_min_proper_plateau(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -3840,89 +4417,105 @@ def pos_max_min_proper_plateau(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (min(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if min(D,delta_f) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if min(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > min(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = max(R, (min(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_min_steady(time_series):
@@ -3935,9 +4528,9 @@ def pos_max_min_steady(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -3946,89 +4539,105 @@ def pos_max_min_steady(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(delta_f_1, (min(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if min(min(D,delta_f),delta_f_1) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if min(min(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > min(min(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = max(R, (min(delta_f_1, (min(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_min_steady_sequence(time_series):
@@ -4041,9 +4650,9 @@ def pos_max_min_steady_sequence(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -4052,89 +4661,105 @@ def pos_max_min_steady_sequence(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(delta_f_1, (min(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if min(min(D,delta_f),delta_f_1) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if min(min(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > min(min(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = max(R, (min(delta_f_1, (min(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_min_strictly_decreasing_sequence(time_series):
@@ -4147,9 +4772,9 @@ def pos_max_min_strictly_decreasing_sequence(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -4158,89 +4783,105 @@ def pos_max_min_strictly_decreasing_sequence(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(delta_f_1, (min(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if min(min(D,delta_f),delta_f_1) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if min(min(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > min(min(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = max(R, (min(delta_f_1, (min(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_min_strictly_increasing_sequence(time_series):
@@ -4253,9 +4894,9 @@ def pos_max_min_strictly_increasing_sequence(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -4264,89 +4905,105 @@ def pos_max_min_strictly_increasing_sequence(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(delta_f_1, (min(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if min(min(D,delta_f),delta_f_1) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if min(min(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > min(min(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = max(R, (min(delta_f_1, (min(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_min_summit(time_series):
@@ -4359,9 +5016,9 @@ def pos_max_min_summit(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -4370,89 +5027,105 @@ def pos_max_min_summit(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (min(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if min(D,delta_f) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if min(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > min(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = max(R, (min(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_min_valley(time_series):
@@ -4465,9 +5138,9 @@ def pos_max_min_valley(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -4476,89 +5149,105 @@ def pos_max_min_valley(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (min(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if min(D,delta_f) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if min(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > min(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = max(R, (min(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_max_min_zigzag(time_series):
@@ -4571,9 +5260,9 @@ def pos_max_min_zigzag(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -4582,89 +5271,105 @@ def pos_max_min_zigzag(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = max(float(R), (min(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if min(D,delta_f) > R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if min(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > min(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = max(R, (min(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = max(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C > R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R > C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = max(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return max(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return max(R,C), time_series, f
 
 
 def pos_min_max_bump_on_decreasing_sequence(time_series):
@@ -4677,9 +5382,9 @@ def pos_min_max_bump_on_decreasing_sequence(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -4688,89 +5393,105 @@ def pos_min_max_bump_on_decreasing_sequence(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (max(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if max(D,delta_f) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if max(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < max(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = min(R, (max(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_max_decreasing(time_series):
@@ -4783,9 +5504,9 @@ def pos_min_max_decreasing(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -4794,89 +5515,105 @@ def pos_min_max_decreasing(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(delta_f_1, (max(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if max(max(D,delta_f),delta_f_1) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if max(max(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < max(max(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = min(R, (max(delta_f_1, (max(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_max_decreasing_sequence(time_series):
@@ -4889,9 +5626,9 @@ def pos_min_max_decreasing_sequence(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -4900,89 +5637,105 @@ def pos_min_max_decreasing_sequence(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(delta_f_1, (max(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if max(max(D,delta_f),delta_f_1) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if max(max(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < max(max(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = min(R, (max(delta_f_1, (max(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_max_decreasing_terrace(time_series):
@@ -4995,9 +5748,9 @@ def pos_min_max_decreasing_terrace(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -5006,89 +5759,105 @@ def pos_min_max_decreasing_terrace(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(delta_f_1, (max(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if max(max(D,delta_f),delta_f_1) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if max(max(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < max(max(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = min(R, (max(delta_f_1, (max(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_max_dip_on_increasing_sequence(time_series):
@@ -5101,9 +5870,9 @@ def pos_min_max_dip_on_increasing_sequence(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -5112,89 +5881,105 @@ def pos_min_max_dip_on_increasing_sequence(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (max(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if max(D,delta_f) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if max(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < max(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = min(R, (max(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_max_gorge(time_series):
@@ -5207,9 +5992,9 @@ def pos_min_max_gorge(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -5218,89 +6003,105 @@ def pos_min_max_gorge(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (max(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if max(D,delta_f) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if max(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < max(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = min(R, (max(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_max_increasing(time_series):
@@ -5313,9 +6114,9 @@ def pos_min_max_increasing(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -5324,89 +6125,105 @@ def pos_min_max_increasing(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(delta_f_1, (max(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if max(max(D,delta_f),delta_f_1) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if max(max(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < max(max(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = min(R, (max(delta_f_1, (max(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_max_increasing_sequence(time_series):
@@ -5419,9 +6236,9 @@ def pos_min_max_increasing_sequence(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -5430,89 +6247,105 @@ def pos_min_max_increasing_sequence(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(delta_f_1, (max(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if max(max(D,delta_f),delta_f_1) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if max(max(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < max(max(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = min(R, (max(delta_f_1, (max(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_max_increasing_terrace(time_series):
@@ -5525,9 +6358,9 @@ def pos_min_max_increasing_terrace(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -5536,89 +6369,105 @@ def pos_min_max_increasing_terrace(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (max(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if max(D,delta_f) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if max(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < max(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = min(R, (max(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_max_inflexion(time_series):
@@ -5631,9 +6480,9 @@ def pos_min_max_inflexion(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -5642,89 +6491,105 @@ def pos_min_max_inflexion(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (max(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if max(D,delta_f) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if max(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < max(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = min(R, (max(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_max_peak(time_series):
@@ -5737,9 +6602,9 @@ def pos_min_max_peak(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -5748,89 +6613,105 @@ def pos_min_max_peak(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (max(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if max(D,delta_f) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if max(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < max(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = min(R, (max(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_max_plain(time_series):
@@ -5843,9 +6724,9 @@ def pos_min_max_plain(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -5854,89 +6735,105 @@ def pos_min_max_plain(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (max(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if max(D,delta_f) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if max(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < max(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = min(R, (max(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_max_plateau(time_series):
@@ -5949,9 +6846,9 @@ def pos_min_max_plateau(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -5960,89 +6857,105 @@ def pos_min_max_plateau(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (max(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if max(D,delta_f) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if max(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < max(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = min(R, (max(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_max_proper_plain(time_series):
@@ -6055,9 +6968,9 @@ def pos_min_max_proper_plain(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -6066,89 +6979,105 @@ def pos_min_max_proper_plain(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (max(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if max(D,delta_f) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if max(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < max(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = min(R, (max(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_max_proper_plateau(time_series):
@@ -6161,9 +7090,9 @@ def pos_min_max_proper_plateau(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -6172,89 +7101,105 @@ def pos_min_max_proper_plateau(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (max(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if max(D,delta_f) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if max(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < max(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = min(R, (max(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_max_steady(time_series):
@@ -6267,9 +7212,9 @@ def pos_min_max_steady(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -6278,89 +7223,105 @@ def pos_min_max_steady(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(delta_f_1, (max(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if max(max(D,delta_f),delta_f_1) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if max(max(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < max(max(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = min(R, (max(delta_f_1, (max(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_max_steady_sequence(time_series):
@@ -6373,9 +7334,9 @@ def pos_min_max_steady_sequence(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -6384,89 +7345,105 @@ def pos_min_max_steady_sequence(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(delta_f_1, (max(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if max(max(D,delta_f),delta_f_1) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if max(max(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < max(max(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = min(R, (max(delta_f_1, (max(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_max_strictly_decreasing_sequence(time_series):
@@ -6479,9 +7456,9 @@ def pos_min_max_strictly_decreasing_sequence(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -6490,89 +7467,105 @@ def pos_min_max_strictly_decreasing_sequence(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(delta_f_1, (max(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if max(max(D,delta_f),delta_f_1) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if max(max(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < max(max(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = min(R, (max(delta_f_1, (max(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_max_strictly_increasing_sequence(time_series):
@@ -6585,9 +7578,9 @@ def pos_min_max_strictly_increasing_sequence(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -6596,89 +7589,105 @@ def pos_min_max_strictly_increasing_sequence(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(delta_f_1), (max(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(delta_f_1, (max(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (max(float(delta_f_1), (max(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if max(max(D,delta_f),delta_f_1) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if max(max(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < max(max(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = min(R, (max(delta_f_1, (max(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_max_summit(time_series):
@@ -6691,9 +7700,9 @@ def pos_min_max_summit(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -6702,89 +7711,105 @@ def pos_min_max_summit(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (max(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if max(D,delta_f) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if max(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < max(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = min(R, (max(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_max_valley(time_series):
@@ -6797,9 +7822,9 @@ def pos_min_max_valley(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -6808,89 +7833,105 @@ def pos_min_max_valley(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (max(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if max(D,delta_f) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if max(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < max(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = min(R, (max(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_max_zigzag(time_series):
@@ -6903,9 +7944,9 @@ def pos_min_max_zigzag(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -6914,89 +7955,105 @@ def pos_min_max_zigzag(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = max(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (max(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if max(D,delta_f) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if max(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < max(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = min(R, (max(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = max(float(C), (max(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = max(C, (max(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = max(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = max(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_min_bump_on_decreasing_sequence(time_series):
@@ -7009,9 +8066,9 @@ def pos_min_min_bump_on_decreasing_sequence(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -7020,89 +8077,105 @@ def pos_min_min_bump_on_decreasing_sequence(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (min(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if min(D,delta_f) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if min(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < min(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = min(R, (min(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_min_decreasing(time_series):
@@ -7115,9 +8188,9 @@ def pos_min_min_decreasing(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -7126,89 +8199,105 @@ def pos_min_min_decreasing(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(delta_f_1, (min(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if min(min(D,delta_f),delta_f_1) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if min(min(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < min(min(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = min(R, (min(delta_f_1, (min(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_min_decreasing_sequence(time_series):
@@ -7221,9 +8310,9 @@ def pos_min_min_decreasing_sequence(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -7232,89 +8321,105 @@ def pos_min_min_decreasing_sequence(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(delta_f_1, (min(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if min(min(D,delta_f),delta_f_1) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if min(min(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < min(min(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = min(R, (min(delta_f_1, (min(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_min_decreasing_terrace(time_series):
@@ -7327,9 +8432,9 @@ def pos_min_min_decreasing_terrace(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -7338,89 +8443,105 @@ def pos_min_min_decreasing_terrace(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(delta_f_1, (min(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if min(min(D,delta_f),delta_f_1) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if min(min(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < min(min(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = min(R, (min(delta_f_1, (min(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_min_dip_on_increasing_sequence(time_series):
@@ -7433,9 +8554,9 @@ def pos_min_min_dip_on_increasing_sequence(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -7444,89 +8565,105 @@ def pos_min_min_dip_on_increasing_sequence(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (min(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if min(D,delta_f) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if min(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < min(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = min(R, (min(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_min_gorge(time_series):
@@ -7539,9 +8676,9 @@ def pos_min_min_gorge(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -7550,89 +8687,105 @@ def pos_min_min_gorge(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (min(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if min(D,delta_f) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if min(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < min(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = min(R, (min(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_min_increasing(time_series):
@@ -7645,9 +8798,9 @@ def pos_min_min_increasing(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -7656,89 +8809,105 @@ def pos_min_min_increasing(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(delta_f_1, (min(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if min(min(D,delta_f),delta_f_1) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if min(min(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < min(min(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = min(R, (min(delta_f_1, (min(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_min_increasing_sequence(time_series):
@@ -7751,9 +8920,9 @@ def pos_min_min_increasing_sequence(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -7762,89 +8931,105 @@ def pos_min_min_increasing_sequence(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(delta_f_1, (min(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if min(min(D,delta_f),delta_f_1) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if min(min(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < min(min(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = min(R, (min(delta_f_1, (min(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_min_increasing_terrace(time_series):
@@ -7857,9 +9042,9 @@ def pos_min_min_increasing_terrace(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -7868,89 +9053,105 @@ def pos_min_min_increasing_terrace(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (min(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if min(D,delta_f) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if min(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < min(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = min(R, (min(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_min_inflexion(time_series):
@@ -7963,9 +9164,9 @@ def pos_min_min_inflexion(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -7974,89 +9175,105 @@ def pos_min_min_inflexion(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (min(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if min(D,delta_f) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if min(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < min(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = min(R, (min(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_min_peak(time_series):
@@ -8069,9 +9286,9 @@ def pos_min_min_peak(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -8080,89 +9297,105 @@ def pos_min_min_peak(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (min(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if min(D,delta_f) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if min(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < min(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = min(R, (min(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_min_plain(time_series):
@@ -8175,9 +9408,9 @@ def pos_min_min_plain(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -8186,89 +9419,105 @@ def pos_min_min_plain(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (min(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if min(D,delta_f) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if min(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < min(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = min(R, (min(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_min_plateau(time_series):
@@ -8281,9 +9530,9 @@ def pos_min_min_plateau(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -8292,89 +9541,105 @@ def pos_min_min_plateau(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (min(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if min(D,delta_f) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if min(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < min(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = min(R, (min(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_min_proper_plain(time_series):
@@ -8387,9 +9652,9 @@ def pos_min_min_proper_plain(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -8398,89 +9663,105 @@ def pos_min_min_proper_plain(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (min(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if min(D,delta_f) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if min(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < min(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = min(R, (min(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_min_proper_plateau(time_series):
@@ -8493,9 +9774,9 @@ def pos_min_min_proper_plateau(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -8504,89 +9785,105 @@ def pos_min_min_proper_plateau(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (min(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if min(D,delta_f) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if min(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < min(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = min(R, (min(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_min_steady(time_series):
@@ -8599,9 +9896,9 @@ def pos_min_min_steady(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -8610,89 +9907,105 @@ def pos_min_min_steady(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(delta_f_1, (min(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if min(min(D,delta_f),delta_f_1) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if min(min(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < min(min(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = min(R, (min(delta_f_1, (min(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_min_steady_sequence(time_series):
@@ -8705,9 +10018,9 @@ def pos_min_min_steady_sequence(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -8716,89 +10029,105 @@ def pos_min_min_steady_sequence(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(delta_f_1, (min(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if min(min(D,delta_f),delta_f_1) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if min(min(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < min(min(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = min(R, (min(delta_f_1, (min(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_min_strictly_decreasing_sequence(time_series):
@@ -8811,9 +10140,9 @@ def pos_min_min_strictly_decreasing_sequence(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -8822,89 +10151,105 @@ def pos_min_min_strictly_decreasing_sequence(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(delta_f_1, (min(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if min(min(D,delta_f),delta_f_1) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if min(min(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < min(min(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = min(R, (min(delta_f_1, (min(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_min_strictly_increasing_sequence(time_series):
@@ -8917,9 +10262,9 @@ def pos_min_min_strictly_increasing_sequence(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -8928,89 +10273,105 @@ def pos_min_min_strictly_increasing_sequence(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(delta_f_1), (min(float(D), float(delta_f))))
+                ct[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), f, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(delta_f_1, (min(D, delta_f)))
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (min(float(delta_f_1), (min(float(D), float(delta_f))))))
-
-                D = float(neutral_f)
-
                 if min(min(D,delta_f),delta_f_1) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    ct[i] = GuardValue(float(inf), f, i)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if min(min(D,delta_f),delta_f_1) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    at[i+1] = GuardValue(float(inf), f, i)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < min(min(D,delta_f),delta_f_1):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
+
+                R = min(R, (min(delta_f_1, (min(D, delta_f)))))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f_1))))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f_1)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f_1))
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f_1)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), ct, i)
+                    at[i+1] = GuardValue(float(inf), at, i)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i+1] = GuardValue(float(inf), at, i)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i+1] = GuardValue(float(inf), ct, i)
+                at[i+1] = GuardValue(float(inf), at, i)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_min_summit(time_series):
@@ -9023,9 +10384,9 @@ def pos_min_min_summit(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -9034,89 +10395,105 @@ def pos_min_min_summit(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (min(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if min(D,delta_f) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if min(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < min(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = min(R, (min(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_min_valley(time_series):
@@ -9129,9 +10506,9 @@ def pos_min_min_valley(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -9140,89 +10517,105 @@ def pos_min_min_valley(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (min(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if min(D,delta_f) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if min(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < min(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = min(R, (min(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
 def pos_min_min_zigzag(time_series):
@@ -9235,9 +10628,9 @@ def pos_min_min_zigzag(time_series):
     C = default_g_f
     D = neutral_f
 
-    at = [0]*len(time_series)
-    ct = [0]*len(time_series)
-    f = [0]*len(time_series)
+    at = [GuardValue(0)]*len(time_series)
+    ct = [GuardValue(0)]*len(time_series)
+    f = [GuardValue(0)]*len(time_series)
 
     i = 0
 
@@ -9246,88 +10639,104 @@ def pos_min_min_zigzag(time_series):
         delta_f_1 = time_series[i+1]
         match word:
             case Semantics.FOUND:
-                C = min(float(D), float(delta_f))
+                ct[i] = GuardValue(0)
+                f[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(D, delta_f)
 
-                ct[i] = float(0)
-                ct[i+1] = float(f[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.FOUND_END:
-                R = min(float(R), (min(float(D), float(delta_f))))
-
-                D = float(neutral_f)
-
                 if min(D,delta_f) < R:
-                    ct[i] = float(f[i])
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(float(inf), ct, i)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if min(D,delta_f) == R:
-                    at[i+1] = float(f[i])
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(float(inf), at, i+1)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < min(D,delta_f):
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
+
+                R = min(R, (min(D, delta_f)))
+
+                D = neutral_f
 
             case Semantics.MAYBE_BEFORE:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_RESET:
-                D = float(neutral_f)
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.IN:
-                C = min(float(C), (min(float(D), float(delta_f))))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                D = float(neutral_f)
+                C = min(C, (min(D, delta_f)))
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = neutral_f
 
             case Semantics.MAYBE_AFTER:
-                D = min(float(D), float(delta_f))
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                D = min(D, delta_f)
 
             case Semantics.OUT_AFTER:
-                R = min(float(R), float(C))
-
-                C = float(default_g_f)
-
-                D = float(neutral_f)
-
                 if C < R:
-                    f[i] = float(0)
-                    at[i] = float(0)
-                    at[i+1] = float(ct[i])
+                    f[i] = GuardValue(0)
+                    at[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
                 if C == R:
-                    f[i] = float(0)
-                    at[i+1] = float(ct[i])
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(float(inf), at, i+1)
+                    at[i] = GuardValue(float(inf), at, i+1)
                 if R < C:
-                    f[i] = float(0)
-                    ct[i] = float(0)
-                    at[i+1] = float(at[i])
+                    f[i] = GuardValue(0)
+                    ct[i] = GuardValue(0)
+                    at[i] = GuardValue(float(inf), at, i+1)
 
-                f[i] = float(0)
-                ct[i+1] = float(ct[i])
-                at[i+1] = float(at[i])
+                R = min(R, C)
+
+                C = default_g_f
+
+                D = neutral_f
+
+            case Semantics.OUT:
+                f[i] = GuardValue(0)
+                ct[i] = GuardValue(float(inf), ct, i+1)
+                at[i] = GuardValue(float(inf), at, i+1)
 
         i += 1 
 
-    return min(R, C)
+    f[len(time_series) - 1] = GuardValue(0)
+    if C > R:
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R == default_g_f):
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(0)
+    if (C == R) | (R != default_g_f):
+        ct[len(time_series) - 1] = GuardValue(1)
+        at[len(time_series) - 1] = GuardValue(1)
+    if R > C:
+        ct[len(time_series) - 1] = GuardValue(0)
+        at[len(time_series) - 1] = GuardValue(1)
+
+
+    return min(R,C), time_series, f
 
 
