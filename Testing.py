@@ -10,14 +10,14 @@ def testing():
     for test in testing:
         function = getattr(GeneratedFunctions, test)
         res = function(testing[test]["time_series"])
-        print(res)
-        print((testing[test]["result"], testing[test]["time_series"], testing[test]["found"]))
-        if res == (testing[test]["result"], testing[test]["time_series"], testing[test]["found"]):
+        if ((res[0], res[1], res[2]).__str__()) == ((testing[test]["result"], testing[test]["time_series"], testing[test]["found"]).__str__()):
             total_ok += 1
         else:
             total_ko += 1
             print("-------------------------")
             print(test + " is KO")
+            print("Result "+(res[0], res[1], res[2]).__str__())
+            print("Expected "+(testing[test]["result"], testing[test]["time_series"], testing[test]["found"]).__str__())
             print("-------------------------")
 
     print("==============================")
