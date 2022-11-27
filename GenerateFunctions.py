@@ -6,25 +6,29 @@ from Enums.Semantics import Semantics
 from Enums.Aggregators import Aggregators
 
 
+# This function generates all the possible combinations of aggregators, features and patterns
 def generate_functions():
     f = open("GeneratedFunctions.py", "w")
+    # Writing imports
     f.write("from math import inf\n")
     f.write("from Enums.Patterns import Patterns\n")
     f.write("from GuardValue import GuardValue\n")
     f.write("from TimeSeriesParser import *\n\n\n")
-    f.close()
 
-    tables = json.load(open('DecorationTables.json'))["tables"]
+    # Getting all the tables from Json files
+    tables = json.load(open('Json/DecorationTables.json'))["tables"]
     aggregators = tables["aggregators"]
     features = tables["features"]
     decoration = tables["decoration"]
-    patterns = json.load(open('SignatureToSemanticPatternGraphs.json'))["graphs"]
+    patterns = json.load(open('Json/Graphs.json'))["graphs"]
 
-    f = open("GeneratedFunctions.py", "a")
+    # Iterating on aggregators
     for aggregator in aggregators:
+        # Iterating of features
         for feature in features:
             g = aggregator.lower()
             phi_f = features[feature]["phi_f"]
+            #Iterating on patterns
             for pattern in Patterns:
                 f.write("def pos_" + aggregator.lower() + "_" + feature + "_" + pattern.value + "(time_series):\n")
 
@@ -64,7 +68,7 @@ def generate_functions():
                 for word in Semantics:
                     after_value = patterns[pattern.value]["after"].__str__()
                     f.write("            case Semantics." + word.name + ":\n")
-                    f.write(write_guard_lines(word, after_value, g, phi_f, 4) + "\n")
+                    f.write(prepare_guard_lines(word, after_value, g, phi_f, 4) + "\n")
                     operations = decoration["after" + after_value][word.value]
                     for operation in operations:
                         f.write("                " + prepare_operation_line(operation, g, phi_f) + "\n\n")
@@ -73,36 +77,30 @@ def generate_functions():
 
                 # Guard end conditions
                 f.write("    f[len(time_series) - 1] = GuardValue(0)\n")
-                f.write("    if C > R:\n")
+                f.write("    if C " + ("<" if aggregator == Aggregators.MIN.value else ">") + " R:\n")
                 f.write("        ct[len(time_series) - 1] = GuardValue(1)\n")
                 f.write("        at[len(time_series) - 1] = GuardValue(0)\n")
-                f.write("    if (C == R) | (R == default_g_f):\n")
+                f.write("    elif (C == R) & (R == default_g_f):\n")
                 f.write("        ct[len(time_series) - 1] = GuardValue(0)\n")
                 f.write("        at[len(time_series) - 1] = GuardValue(0)\n")
-                f.write("    if (C == R) | (R != default_g_f):\n")
+                f.write("    elif (C == R) & (R != default_g_f):\n")
                 f.write("        ct[len(time_series) - 1] = GuardValue(1)\n")
                 f.write("        at[len(time_series) - 1] = GuardValue(1)\n")
-                f.write("    if R > C:\n")
+                f.write("    elif R " + ("<" if aggregator == Aggregators.MIN.value else ">") + " C:\n")
                 f.write("        ct[len(time_series) - 1] = GuardValue(0)\n")
                 f.write("        at[len(time_series) - 1] = GuardValue(1)\n\n")
 
-                """# Pointers update in f, at, ct tables
-                f.write("    i = len(semantics)-1\n")
-                f.write("    while i >= 0:\n")
-                f.write("        at[i].update(f, at, ct)\n")
-                f.write("        ct[i].update(f, at, ct)\n")
-                f.write("        f[i].update(f, at, ct)\n")
-                f.write("        i -= 1\n")"""
-
+                # Writing return statement
                 f.write("\n    return " + g + "(R,C), time_series, f\n")
                 f.write("\n\n")
 
     f.close()
 
 
+# Preparation of an operation on an accumulator using the decoration table JSON
 def prepare_operation_line(operation, g, phi_f, sub_op=False):
     line = ""
-    # Beginning of the code line generated (if not a sub operation
+    # Beginning of the code line generated (if not a sub operation)
     if not sub_op:
         line = line + operation["acc"] + " = "
 
@@ -138,10 +136,13 @@ def prepare_operation_line(operation, g, phi_f, sub_op=False):
     return line
 
 
-def write_guard_lines(semantic, after_value, g, phi_f, nb_tab):
+# Preparation of the guard operations lines using the decoration table JSON
+def prepare_guard_lines(semantic, after_value, g, phi_f, nb_tab):
     lines = ""
+    # Defining a variable to indent the code block according to the level it will be writen in the final file
     tab = nb_tab * "    "
-    tables = json.load(open('DecorationTables.json'))["tables"]
+    # Getting the appropriate part of the decoration table
+    tables = json.load(open('Json/DecorationTables.json'))["tables"]
     guard_table = tables["decoration"]["guard"]["after" + after_value]
     for case in guard_table[semantic.value]:
         condition = "condition" in case
@@ -163,5 +164,5 @@ def write_guard_lines(semantic, after_value, g, phi_f, nb_tab):
             else:
                 match = re.search(r"(at|ct|f)\[(i\+1|i)\]", value)
                 if not (match is None):
-                    lines = lines + tab + var + " = GuardValue(float(inf), " + match.group(1) + ", " + match.group(2) + ")" + "\n"
+                    lines = lines + tab + var + " = GuardValue(float(inf), " + match.group(1) + ", " + match.group(2) + ", \"" + match.group(1) + "\")" + "\n"
     return lines

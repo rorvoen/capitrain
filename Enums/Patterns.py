@@ -1,5 +1,7 @@
 from enum import Enum
 
+# This enumeration represent the different available patterns
+
 
 class Patterns(Enum):
     BUMP_ON_DECREASING_SEQUENCE = "bump_on_decreasing_sequence"

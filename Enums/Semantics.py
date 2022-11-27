@@ -1,5 +1,7 @@
 from enum import Enum
 
+# This enumeration represent the whole semantic language
+
 
 class Semantics(Enum):
     FOUND = "found"

@@ -1319,6 +1319,11 @@
               "produce": "out"
             },
             {
+              "to": "s",
+              "consume": "=",
+              "produce": "out"
+            },
+            {
               "to": "b",
               "consume": ">",
               "produce": "maybe_b"
@@ -1334,6 +1339,11 @@
               "produce": "found"
             },
             {
+              "to": "s",
+              "consume": "=",
+              "produce": "out_r"
+            },
+            {
               "to": "d",
               "consume": ">",
               "produce": "out_r"
@@ -1346,6 +1356,11 @@
             {
               "to": "a",
               "consume": "<",
+              "produce": "out_a"
+            },
+            {
+              "to": "s",
+              "consume": "=",
               "produce": "out_a"
             },
             {
@@ -1364,6 +1379,11 @@
               "produce": "maybe_b"
             },
             {
+              "to": "s",
+              "consume": "=",
+              "produce": "out"
+            },
+            {
               "to": "d",
               "consume": ">",
               "produce": "out"
@@ -1376,6 +1396,11 @@
             {
               "to": "a",
               "consume": "<",
+              "produce": "out_r"
+            },
+            {
+              "to": "s",
+              "consume": "=",
               "produce": "out_r"
             },
             {
@@ -1392,6 +1417,11 @@
               "to": "c",
               "consume": "<",
               "produce": "in"
+            },
+            {
+              "to": "s",
+              "consume": "=",
+              "produce": "out_a"
             },
             {
               "to": "d",

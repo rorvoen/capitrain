@@ -20,7 +20,7 @@ def time_series_to_signature_parser(time_series):
 
 def signature_to_semantic(signature, pattern):
     res = []
-    graph = json.load(open('SignatureToSemanticPatternGraphs.json'))["graphs"][pattern.value]
+    graph = json.load(open('Json/Graphs.json'))["graphs"][pattern.value]
     current_state = graph["entryState"]
     states = graph["states"]
     i = 0
