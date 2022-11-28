@@ -29,7 +29,7 @@ def cpu_charge(csv, nbtest):
     data = json.load(open(csv))
 
     print('\nTest n°' + nbtest.__str__() + '\n nombre de lignes à traiter: ' + len(data).__str__())
-    print('-'*50)
+    print('-'*70)
 
     for function in functions:
         to_run = getattr(GeneratedFunctions, function)
